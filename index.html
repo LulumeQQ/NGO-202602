@@ -90,7 +90,24 @@
             box-shadow: 0 0 0 2px #ffedd5;
         }
 
-        /* 導覽頁雜誌風樣式 */
+        /* 導覽頁：摺疊動畫 */
+        .guide-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            opacity: 0;
+        }
+        .guide-content.open {
+            max-height: 2000px; /* 足夠大的高度 */
+            opacity: 1;
+        }
+        .guide-arrow {
+            transition: transform 0.3s;
+        }
+        .guide-arrow.open {
+            transform: rotate(180deg);
+        }
+
         .guide-tag {
             background: linear-gradient(120deg, #f97316 0%, #fb923c 100%);
             color: white;
@@ -119,7 +136,7 @@
         }
         .scroll-item {
             scroll-snap-align: center;
-            flex: 0 0 85%; /* 讓圖片稍微露出一點下一張 */
+            flex: 0 0 85%;
             border-radius: 0.75rem;
             overflow: hidden;
             border: 1px solid #eee;
@@ -221,8 +238,14 @@
                     { id: 'd2-3', time: '13:10', title: '賽道挑戰者', desc: '★停留：40分鐘\n★憑乘車卷x3 (Hotmail信件)', type: 'play', highlight: true },
                     { id: 'd2-4', time: '14:00', title: '午餐：GRAN VIEW', desc: '樂園內餐廳 (玩完賽道挑戰者再吃)', type: 'food' },
                     { id: 'd2-5', time: '17:00', title: '離開樂園', desc: '前往晚餐 (車程約1hr)', type: 'transport' },
-                    { id: 'd2-6', time: '18:00', title: '晚餐：萬來亭', desc: '停留：1小時\n名古屋市緑區作の山町', type: 'food', addr: '日本〒458-0038 Aichi, Nagoya, Midori Ward, Sakunoyamacho, 230 メゾン作の山 １' },
+                    { id: 'd2-6', time: '18:00', title: '晚餐：萬來亭拉麵', desc: '停留：1小時\n停車場：Banraitei Parking Lot', type: 'food', addr: 'Banraitei Parking Lot, 2 Chome Shiomigaoka, Midori Ward, Nagoya, Aichi 458-0037日本' },
                     { id: 'd2-7', time: '19:30', title: '住宿：Airbnb', desc: '愛知縣名古屋市緑區', type: 'hotel', addr: '愛知縣名古屋市緑區鳴海町字作町26號' }
+                ],
+                d3: [
+                    { id: 'd3-1', time: '07:30', title: '早餐：便利商店', desc: '選擇下方 7-11 或 FamilyMart', type: 'food', highlight: true },
+                    { id: 'd3-2', time: '', title: '7-11 名古屋浦里5丁目', desc: '地址：名古屋市緑区浦里5-203', type: 'shop', addr: '名古屋市緑区浦里5-203' },
+                    { id: 'd3-3', time: '', title: '7-11 名古屋藥師山', desc: '地址：名古屋市緑区鳴海町字薬師山179-1', type: 'shop', addr: '名古屋市緑区鳴海町字薬師山179-1' },
+                    { id: 'd3-4', time: '', title: 'FamilyMart 潮見之丘', desc: '地址：名古屋市緑区潮見が丘1-79', type: 'shop', addr: '名古屋市緑区潮見が丘1-79' }
                 ]
             },
             checklist: ['護照', '網卡/漫遊', '日幣現金', '信用卡', '駕照日文譯本', '行動電源', '保暖衣物', '個人藥品', 'Hotmail 乘車卷']
@@ -288,11 +311,21 @@
                 </div>
             </div>`;
 
-            // Day Switcher
+            // Day Switcher with Date & Weekday
             let switcherHTML = `
-            <div class="flex px-4 gap-2 mb-4 sticky top-0 z-10 py-2 bg-muji-bg/95 backdrop-blur">
-                <button onclick="switchDay('d1')" id="btn-d1" class="flex-1 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${currentDay === 'd1' ? 'bg-cat-orange text-white' : 'bg-white text-gray-400'}">Day 1 (2/06)</button>
-                <button onclick="switchDay('d2')" id="btn-d2" class="flex-1 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${currentDay === 'd2' ? 'bg-cat-orange text-white' : 'bg-white text-gray-400'}">Day 2 (2/07)</button>
+            <div class="flex px-4 gap-2 mb-4 sticky top-0 z-10 py-2 bg-muji-bg/95 backdrop-blur overflow-x-auto no-scrollbar">
+                <button onclick="switchDay('d1')" id="btn-d1" class="min-w-[100px] flex-1 py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex flex-col items-center ${currentDay === 'd1' ? 'bg-cat-orange text-white' : 'bg-white text-gray-400'}">
+                    <span>Day 1</span>
+                    <span class="text-[10px] opacity-80">2/06 (Fri)</span>
+                </button>
+                <button onclick="switchDay('d2')" id="btn-d2" class="min-w-[100px] flex-1 py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex flex-col items-center ${currentDay === 'd2' ? 'bg-cat-orange text-white' : 'bg-white text-gray-400'}">
+                    <span>Day 2</span>
+                    <span class="text-[10px] opacity-80">2/07 (Sat)</span>
+                </button>
+                <button onclick="switchDay('d3')" id="btn-d3" class="min-w-[100px] flex-1 py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex flex-col items-center ${currentDay === 'd3' ? 'bg-cat-orange text-white' : 'bg-white text-gray-400'}">
+                    <span>Day 3</span>
+                    <span class="text-[10px] opacity-80">2/08 (Sun)</span>
+                </button>
             </div>
             `;
 
@@ -307,8 +340,12 @@
 
         function switchDay(day) {
             currentDay = day;
-            document.getElementById('btn-d1').className = `flex-1 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${day === 'd1' ? 'bg-cat-orange text-white' : 'bg-white text-gray-400'}`;
-            document.getElementById('btn-d2').className = `flex-1 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${day === 'd2' ? 'bg-cat-orange text-white' : 'bg-white text-gray-400'}`;
+            ['d1', 'd2', 'd3'].forEach(d => {
+                const btn = document.getElementById(`btn-${d}`);
+                if(btn) {
+                    btn.className = `min-w-[100px] flex-1 py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex flex-col items-center ${day === d ? 'bg-cat-orange text-white' : 'bg-white text-gray-400'}`;
+                }
+            });
             document.getElementById('timeline-list').innerHTML = renderDayItems(day);
             checkSelection();
         }
@@ -387,112 +424,122 @@
 
             const loginUrl = "https://d-reserve.jp/auth/realms/M000000678/protocol/openid-connect/auth?response_type=code&client_id=directin-s4&redirect_uri=https%3A%2F%2Fd-reserve.jp%2Fguest-reserve-front%2Fsso%2Flogin?hotelCode%3D0000001590%26return_url%3Dhttps%253A%252F%252Fd-reserve.jp%252Fauth%252Frealms%252Fdirectin-s4%252Fcdp%252Fgroups%252FM000000678%252Fredirects%252Faccount%253Freferrer_uri%253Dhttps%25253A%25252F%25252Fd-reserve.jp%25252FGSEA001F01300%25252FGSEA001A01%25253FhotelCode%25253D0000001590%252526lang%25253Den&state=faadacc5-08c9-485f-972f-9681fbea58dd&login=true&ui_locales=en&scope=openid";
 
-            container.innerHTML = `
-            <div class="p-6 space-y-8">
-                <div class="bg-white rounded-3xl overflow-hidden shadow-soft">
-                    <div class="p-6 pb-2">
-                        <span class="guide-tag">Shopping Center</span>
-                        <h2 class="text-2xl font-black text-muji-text mt-2">JR Gate Tower Mall</h2>
-                        <div class="flex items-center gap-2 mt-2 text-gray-500 text-xs">
-                            <i class="fa-solid fa-location-dot text-cat-orange"></i>
-                            <span>JR 名古屋站直結</span>
+            // Helper function to create expandable card
+            const createGuideCard = (id, title, tag, contentHTML, coverImg) => `
+                <div class="bg-white rounded-3xl overflow-hidden shadow-soft transition-all">
+                    <div class="relative h-48 cursor-pointer group" onclick="toggleGuide('${id}')">
+                        <img src="${coverImg}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-6">
+                            <span class="guide-tag self-start">${tag}</span>
+                            <div class="flex justify-between items-end">
+                                <h2 class="text-2xl font-black text-white drop-shadow-md">${title}</h2>
+                                <button class="bg-white/20 backdrop-blur-md text-white border border-white/50 rounded-full w-8 h-8 flex items-center justify-center guide-arrow" id="arrow-${id}">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 border-y border-gray-100 p-4">
-                         <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
-                            <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>停車場入口 (一般/南口)
-                        </h3>
-                        
-                        <div class="scroll-gallery no-scrollbar">
-                            ${parkingImages.map((img, i) => `
-                                <div class="scroll-item shadow-sm">
-                                    <img src="${img}" class="w-full h-40 object-cover" onclick="showFullImage('${img}')">
-                                    <div class="scroll-indicator">${i+1}/4</div>
-                                </div>
-                            `).join('')}
+                    <div id="guide-${id}" class="guide-content bg-white">
+                        <div class="p-6 border-t border-gray-100">
+                            ${contentHTML}
                         </div>
-                        <div class="text-center text-[10px] text-gray-400 mt-2"><i class="fa-solid fa-left-right mr-1"></i>左右滑動查看示意圖</div>
-                    </div>
-                    
-                    <div class="p-6 space-y-6">
-                        <div>
-                            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-sm leading-relaxed">
-                                <p class="font-bold text-cat-orange mb-1">タワーズ一般駐車場 南口入口</p>
-                                <p class="text-gray-600 mb-2 text-xs">建議直接在導航輸入下方電話，這是最保險的方式。</p>
-                                <a href="tel:0525867811" class="flex items-center justify-center bg-white border border-orange-200 text-cat-orange font-mono font-bold py-2 rounded-lg shadow-sm active:scale-95 transition-transform">
-                                    <i class="fa-solid fa-phone mr-2"></i> 052-586-7811
-                                </a>
-                            </div>
-                        </div>
-
-                        <hr class="border-dashed border-gray-200">
-
-                        <div>
-                            <h3 class="font-bold text-lg text-muji-text mb-3 flex items-center">
-                                <i class="fa-solid fa-camera text-cat-orange mr-2"></i>Bic Camera 攻略
-                            </h3>
-                            <p class="text-sm text-gray-600 mb-3 pl-1">位於 JR Gate Tower 的 <span class="guide-highlight">9F 與 10F</span>。</p>
-                            
-                            <div class="bg-white border border-gray-100 p-4 rounded-xl text-sm shadow-sm">
-                                <p class="font-bold text-gray-700 mb-3 border-b pb-2">🅿️ 停車折抵規則</p>
-                                <ul class="space-y-3 text-gray-600 text-xs">
-                                    <li class="flex justify-between items-center">
-                                        <span>消費滿 <span class="font-mono text-base">5,000</span> 円</span> 
-                                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-bold">折 1 hr</span>
-                                    </li>
-                                    <li class="flex justify-between items-center">
-                                        <span>消費滿 <span class="font-mono text-base">20,000</span> 円</span> 
-                                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-bold">折 2 hr</span>
-                                    </li>
-                                    <li class="flex justify-between items-center">
-                                        <span>消費滿 <span class="font-mono text-base">50,000</span> 円</span> 
-                                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-bold">折 3 hr</span>
-                                    </li>
-                                </ul>
-                                <div class="mt-3 flex items-start gap-2 text-xs text-red-500 bg-red-50 p-2 rounded">
-                                    <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
-                                    <span>請務必在結帳時出示停車券，離場前無法補登。</span>
-                                </div>
-                            </div>
+                        <div class="text-center pb-4 pt-2 cursor-pointer text-gray-400 hover:text-cat-orange" onclick="toggleGuide('${id}')">
+                            <span class="text-xs uppercase font-bold tracking-widest">Close</span>
                         </div>
                     </div>
                 </div>
+            `;
 
-                 <div class="bg-white rounded-3xl overflow-hidden shadow-soft">
-                    <div class="p-6 pb-2">
-                        <span class="guide-tag">Hotel</span>
-                        <h2 class="text-2xl font-black text-muji-text mt-2">鈴鹿賽道樂園酒店</h2>
+            // Content for JR Gate Tower
+            const jrContent = `
+                <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
+                     <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
+                        <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>停車場入口 (一般/南口)
+                    </h3>
+                    <div class="scroll-gallery no-scrollbar">
+                        ${parkingImages.map((img, i) => `
+                            <div class="scroll-item shadow-sm">
+                                <img src="${img}" class="w-full h-40 object-cover" onclick="showFullImage('${img}')">
+                                <div class="scroll-indicator">${i+1}/4</div>
+                            </div>
+                        `).join('')}
                     </div>
+                    <div class="text-center text-[10px] text-gray-400 mt-2"><i class="fa-solid fa-left-right mr-1"></i>左右滑動查看示意圖</div>
+                </div>
 
-                    <div class="bg-gray-50 border-y border-gray-100 p-4">
-                         <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
-                            <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>住宿者專用停車場
-                        </h3>
-                         <div class="scroll-gallery no-scrollbar">
-                            ${suzukaImages.map((img, i) => `
-                                <div class="scroll-item shadow-sm">
-                                    <img src="${img}" class="w-full h-40 object-cover" onclick="showFullImage('${img}')">
-                                    <div class="scroll-indicator">${i+1}/3</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="text-center text-[10px] text-gray-400 mt-2"><i class="fa-solid fa-left-right mr-1"></i>左右滑動查看示意圖</div>
-                    </div>
-
-                    <div class="p-6 space-y-4">
-                         <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-sm leading-relaxed">
-                            <p class="font-bold text-cat-orange mb-2"><i class="fa-solid fa-bell mr-1"></i>Check-in 重要須知</p>
-                            <p class="text-gray-700 mb-2">櫃台位於<span class="font-bold">「主棟」</span>。</p>
-                            <p class="text-gray-600 text-xs">即使住宿於 West 或 North 棟，辦理入住時也請先至主棟內的飯店櫃台。工作人員會再次為您指引住宿棟附近的停車場。</p>
-                        </div>
-                        
-                        <a href="${loginUrl}" target="_blank" class="block w-full bg-muji-text text-white text-center font-bold py-3 rounded-xl shadow-lg hover:bg-black transition-colors">
-                            <i class="fa-solid fa-right-to-bracket mr-2"></i>飯店登入 (Check-in)
+                <div class="space-y-6">
+                    <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-sm leading-relaxed">
+                        <p class="font-bold text-cat-orange mb-1">タワーズ一般駐車場 南口入口</p>
+                        <p class="text-gray-600 mb-2 text-xs">建議直接在導航輸入下方電話，這是最保險的方式。</p>
+                        <a href="tel:0525867811" class="flex items-center justify-center bg-white border border-orange-200 text-cat-orange font-mono font-bold py-2 rounded-lg shadow-sm active:scale-95 transition-transform">
+                            <i class="fa-solid fa-phone mr-2"></i> 052-586-7811
                         </a>
                     </div>
+                    
+                    <div>
+                        <h3 class="font-bold text-lg text-muji-text mb-3 flex items-center">
+                            <i class="fa-solid fa-camera text-cat-orange mr-2"></i>Bic Camera 攻略
+                        </h3>
+                        <p class="text-sm text-gray-600 mb-3 pl-1">位於 JR Gate Tower 的 <span class="guide-highlight">9F 與 10F</span>。</p>
+                        <div class="bg-white border border-gray-100 p-4 rounded-xl text-sm shadow-sm">
+                            <p class="font-bold text-gray-700 mb-3 border-b pb-2">🅿️ 停車折抵規則</p>
+                            <ul class="space-y-3 text-gray-600 text-xs">
+                                <li class="flex justify-between items-center"><span>滿 <span class="font-mono text-base">5,000</span> 円</span> <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-bold">折 1 hr</span></li>
+                                <li class="flex justify-between items-center"><span>滿 <span class="font-mono text-base">20,000</span> 円</span> <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-bold">折 2 hr</span></li>
+                                <li class="flex justify-between items-center"><span>滿 <span class="font-mono text-base">50,000</span> 円</span> <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-bold">折 3 hr</span></li>
+                            </ul>
+                            <div class="mt-3 flex items-start gap-2 text-xs text-red-500 bg-red-50 p-2 rounded">
+                                <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
+                                <span>請務必在結帳時出示停車券，離場前無法補登。</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            `;
+
+            // Content for Suzuka Hotel
+            const suzukaContent = `
+                <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
+                     <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
+                        <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>住宿者專用停車場
+                    </h3>
+                    <div class="scroll-gallery no-scrollbar">
+                        ${suzukaImages.map((img, i) => `
+                            <div class="scroll-item shadow-sm">
+                                <img src="${img}" class="w-full h-40 object-cover" onclick="showFullImage('${img}')">
+                                <div class="scroll-indicator">${i+1}/3</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="text-center text-[10px] text-gray-400 mt-2"><i class="fa-solid fa-left-right mr-1"></i>左右滑動查看示意圖</div>
+                </div>
+
+                <div class="space-y-4">
+                     <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-sm leading-relaxed">
+                        <p class="font-bold text-cat-orange mb-2"><i class="fa-solid fa-bell mr-1"></i>Check-in 重要須知</p>
+                        <p class="text-gray-700 mb-2">櫃台位於<span class="font-bold">「主棟」</span>。</p>
+                        <p class="text-gray-600 text-xs">即使住宿於 West 或 North 棟，辦理入住時也請先至主棟內的飯店櫃台。工作人員會再次為您指引住宿棟附近的停車場。</p>
+                    </div>
+                    
+                    <a href="${loginUrl}" target="_blank" class="block w-full bg-muji-text text-white text-center font-bold py-3 rounded-xl shadow-lg hover:bg-black transition-colors active:scale-95">
+                        <i class="fa-solid fa-right-to-bracket mr-2"></i>飯店登入 (Check-in)
+                    </a>
+                </div>
+            `;
+
+            container.innerHTML = `
+            <div class="p-6 space-y-8">
+                ${createGuideCard('jr', 'JR Gate Tower', 'Shopping', jrContent, parkingImages[0])}
+                ${createGuideCard('suzuka', '鈴鹿賽道飯店', 'Hotel', suzukaContent, suzukaImages[0])}
             </div>`;
+        }
+
+        function toggleGuide(id) {
+            const content = document.getElementById(`guide-${id}`);
+            const arrow = document.getElementById(`arrow-${id}`);
+            content.classList.toggle('open');
+            arrow.classList.toggle('open');
         }
 
         // --- 3. WALLET MODULE ---
@@ -575,7 +622,6 @@
         function handleCalcKey(event) {
             if (event.key === 'Enter') {
                 calculate();
-                // Close Keyboard
                 event.target.blur();
             }
         }
@@ -598,7 +644,6 @@
                 reader.onload = function(e) {
                     const img = new Image();
                     img.onload = function() {
-                        // Canvas Compress to avoid LocalStorage Limit
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
                         const maxWidth = 800; 
@@ -615,7 +660,6 @@
                         
                         tempImgBase64 = canvas.toDataURL('image/jpeg', 0.6); // Quality 0.6
                         
-                        // Show Preview
                         const pArea = document.getElementById('preview-area');
                         const pImg = document.getElementById('img-preview');
                         pArea.classList.remove('hidden');
@@ -641,15 +685,13 @@
             };
 
             expenses.push(newExp);
-            // Safety check for LocalStorage quota
             try {
                 localStorage.setItem('trip_expenses', JSON.stringify(expenses));
             } catch (e) {
                 alert('儲存空間已滿，請刪除舊照片或文字紀錄。');
-                expenses.pop(); // Revert
+                expenses.pop();
             }
             
-            // Reset
             tempImgBase64 = null;
             renderWallet(document.getElementById('app-content'));
         }
@@ -669,14 +711,6 @@
 
         // --- 4. LISTS MODULE ---
         function renderLists(container) {
-            // Links regex
-            const linkify = (text) => {
-                const urlRegex = /(https?:\/\/[^\s]+)/g;
-                return text.replace(urlRegex, function(url) {
-                    return `<a href="${url}" target="_blank" class="text-cat-orange underline font-bold"><i class="fa-solid fa-link mr-1"></i>連結</a>`;
-                })
-            };
-
             container.innerHTML = `
             <div class="p-4 space-y-6">
                 <div class="bg-white rounded-3xl p-5 shadow-soft">
@@ -700,8 +734,7 @@
                     <textarea id="memo-area" class="flex-1 w-full bg-muji-bg rounded-xl p-3 text-sm leading-relaxed outline-none resize-none border border-transparent focus:border-cat-orange" placeholder="在這裡記下想去的地方、代購清單...">${memoContent}</textarea>
                     
                     <div class="mt-3 flex justify-between items-center">
-                         <div id="memo-links" class="flex gap-2 overflow-x-auto max-w-[200px]">
-                            </div>
+                         <div id="memo-links" class="flex gap-2 overflow-x-auto max-w-[200px]"></div>
                          <button onclick="saveMemo()" class="bg-cat-orange text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md">儲存</button>
                     </div>
                 </div>
@@ -718,7 +751,6 @@
             localStorage.setItem('trip_memo', val);
             memoContent = val;
             
-            // Extract links for preview
             const matches = val.match(/(https?:\/\/[^\s]+)/g);
             const linkContainer = document.getElementById('memo-links');
             if(matches) {
