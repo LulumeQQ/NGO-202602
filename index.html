@@ -50,6 +50,7 @@
         .trip-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 2px solid transparent;
+            cursor: pointer;
         }
         .trip-card.active {
             border-color: #f97316;
@@ -75,11 +76,12 @@
 
         /* 時間軸橘色點點 */
         .timeline-dot {
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.3s;
         }
-        .trip-card.active ~ .timeline-dot, 
-        .trip-card.active + .timeline-container .timeline-dot {
+        .timeline-dot.active-dot {
             background-color: #f97316 !important;
+            border-color: #fff;
+            transform: scale(1.2);
         }
 
         /* 輸入框樣式 */
@@ -153,19 +155,23 @@
             ],
             itinerary: {
                 d1: [
-                    { id: 'd1-1', time: '03:30', title: '機場接送', desc: '家裡 -> 桃園機場', type: 'transport', highlight: true },
-                    { id: 'd1-2', time: '07:35', title: '飛往名古屋', desc: 'CI 0154', type: 'flight' },
+                    { id: 'd1-1', time: '03:00', title: '機場接送', desc: '家裡 -> 桃園機場', type: 'transport', highlight: true },
+                    { id: 'd1-2', time: '07:35', title: '起飛 CI 0154', desc: '飛往名古屋', type: 'flight' },
                     { id: 'd1-3', time: '11:05', title: '抵達名古屋', desc: '中部國際機場', type: 'arrival' },
                     { id: 'd1-4', time: '12:00', title: '取車', desc: 'Centrair, 1-chōme−1', type: 'car', addr: '〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一, 日本' },
-                    { id: 'd1-5', time: '13:30', title: 'JR Gate Tower Mall', desc: '中餐與逛 Bic Camera', type: 'food', addr: '1-1-4 Meieki, Nakamura-ku, Nagoya-shi, Aichi 450-6001' },
-                    { id: 'd1-6', time: '16:00', title: '前往住宿', desc: '鈴鹿賽車樂園酒店', type: 'hotel', addr: '7992 Inoucho, Suzuka, Mie 510-0201日本' }
+                    { id: 'd1-5', time: '13:00', title: 'JR Gate Tower Mall', desc: '午餐 & 逛 Bic Camera (約3hr)', type: 'shop', addr: '1-1-4 Meieki, Nakamura-ku, Nagoya-shi, Aichi 450-6001' },
+                    { id: 'd1-6', time: '17:00', title: '住宿：鈴鹿賽道樂園酒店', desc: '★含早晚餐、4張樂園護照<br>★含賽道貴賓休息室卷', type: 'hotel', addr: '7992 Inoucho, Suzuka, Mie 510-0201日本' },
+                    { id: 'd1-7', time: '19:30', title: '晚餐', desc: '飯店自助晚餐', type: 'food' }
                 ],
                 d2: [
-                    { id: 'd2-1', time: '09:00', title: '鈴鹿賽車樂園', desc: '玩到晚上 17:00', type: 'play', highlight: true },
-                    { id: 'd2-2', time: '18:30', title: '前往 Airbnb', desc: '名古屋市緑區', type: 'hotel', addr: '愛知縣名古屋市緑區鳴海町字作町26號' }
+                    { id: 'd2-1', time: '07:00', title: '早餐', desc: '飯店自助早餐', type: 'food' },
+                    { id: 'd2-2', time: '09:30', title: '鈴鹿賽車樂園', desc: '★玩到17:00<br>★記得拿中文地圖、掃QR看排隊時間', type: 'play', highlight: true },
+                    { id: 'd2-3', time: '12:00', title: '午餐：GRAN VIEW', desc: '樂園內餐廳', type: 'food' },
+                    { id: 'd2-4', time: '13:10', title: '賽道挑戰者 (Circuit Challenger)', desc: '★憑乘車卷x3 (Hotmail信件)', type: 'play', highlight: true },
+                    { id: 'd2-5', time: '18:30', title: '住宿：Airbnb', desc: '愛知縣名古屋市緑區', type: 'hotel', addr: '愛知縣名古屋市緑區鳴海町字作町26號' }
                 ]
             },
-            checklist: ['護照', '網卡/漫遊', '日幣現金', '信用卡', '駕照日文譯本', '行動電源', '保暖衣物', '個人藥品']
+            checklist: ['護照', '網卡/漫遊', '日幣現金', '信用卡', '駕照日文譯本', '行動電源', '保暖衣物', '個人藥品', 'Hotmail 乘車卷']
         };
 
         // --- State Management ---
@@ -183,7 +189,8 @@
             car: 'fa-key',
             food: 'fa-utensils',
             hotel: 'fa-bed',
-            play: 'fa-ticket'
+            play: 'fa-ticket',
+            shop: 'fa-bag-shopping'
         };
 
         // --- Core Functions ---
@@ -274,7 +281,7 @@
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h4 class="font-bold text-lg text-muji-text ${item.highlight ? 'text-cat-orange' : ''}">${item.title}</h4>
-                                    <p class="text-sm text-gray-500 mt-1 leading-relaxed">${item.desc}</p>
+                                    <p class="text-sm text-gray-500 mt-1 leading-relaxed whitespace-pre-line">${item.desc}</p>
                                 </div>
                                 <i class="fa-solid ${iconClass} ${highlightClass} opacity-20 text-3xl absolute top-3 right-3"></i>
                             </div>
@@ -290,13 +297,13 @@
         function toggleSelection(id) {
             // Remove active from all
             document.querySelectorAll('.trip-card').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.timeline-dot').forEach(el => el.classList.remove('bg-cat-orange'));
+            document.querySelectorAll('.timeline-dot').forEach(el => el.classList.remove('active-dot'));
             
             // Add to current
             const card = document.getElementById(`card-${id}`);
             const dot = document.getElementById(`dot-${id}`);
             if(card) card.classList.add('active');
-            if(dot) dot.classList.add('bg-cat-orange');
+            if(dot) dot.classList.add('active-dot');
             
             localStorage.setItem('trip_current_selection', id);
         }
@@ -431,7 +438,6 @@
         function calculate() {
             const input = document.getElementById('calc-input').value;
             try {
-                // Warning: eval is dangerous in general web apps, but safe for a local static tool like this
                 const res = eval(input.replace(/[^-()\d/*+.]/g, '')); 
                 document.getElementById('calc-result').innerText = '¥ ' + res.toLocaleString();
                 document.getElementById('calc-twd').innerText = '≈ NT$ ' + Math.round(res * walletRate).toLocaleString();
@@ -554,7 +560,6 @@
         function toggleCheck(item) {
             checklistState[item] = !checklistState[item];
             localStorage.setItem('trip_checklist', JSON.stringify(checklistState));
-            // Re-render handled by checkbox state, no need full reload
         }
 
         function saveMemo() {
@@ -562,7 +567,7 @@
             localStorage.setItem('trip_memo', val);
             memoContent = val;
             
-            // Extract links for preview (simple implementation)
+            // Extract links for preview
             const matches = val.match(/(https?:\/\/[^\s]+)/g);
             const linkContainer = document.getElementById('memo-links');
             if(matches) {
