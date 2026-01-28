@@ -59,7 +59,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 時間軸樣式 */
+        /* 時間軸線條 */
         .timeline-line {
             position: absolute;
             left: 1.25rem;
@@ -70,25 +70,54 @@
             z-index: 0;
         }
 
-        /* 行程選取特效 */
-        .itinerary-item {
+        /* --- 互動式行程樣式的核心 CSS --- */
+        .timeline-item {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        /* 預設狀態 - 點 */
+        .time-dot {
+            transition: all 0.3s ease;
+            background-color: #D1D5DB; /* gray-300 */
+        }
+        /* 預設狀態 - 時間文字 */
+        .time-text {
+            transition: color 0.3s ease;
+            color: #9CA3AF; /* gray-400 */
+        }
+        /* 預設狀態 - 卡片 */
+        .card-box {
             transition: all 0.3s ease;
             border: 2px solid transparent;
-        }
-        .itinerary-item.selected {
-            border-color: #EA580C;
-            background-color: #FFF7ED; /* orange-50 */
-            transform: scale(1.02);
         }
         .paw-indicator {
             display: none;
             position: absolute;
-            right: 10px;
-            top: 10px;
+            right: 12px;
+            top: 12px;
             color: #EA580C;
             animation: bounce 1s infinite;
+            z-index: 10;
         }
-        .itinerary-item.selected .paw-indicator {
+
+        /* === ACTIVE 狀態 (當父層 timeline-item 擁有 active class 時) === */
+        .timeline-item.active .time-dot {
+            background-color: #EA580C;
+            box-shadow: 0 0 0 3px #FFEDD5; /* orange-100 ring */
+            transform: scale(1.2);
+        }
+        .timeline-item.active .time-text {
+            color: #EA580C;
+            font-weight: 700;
+        }
+        .timeline-item.active .card-box {
+            border-color: #EA580C;
+            background-color: #FFF7ED; /* orange-50 */
+            transform: scale(1.01);
+            box-shadow: 0 10px 25px -5px rgba(234, 88, 12, 0.15);
+        }
+        .timeline-item.active .paw-indicator {
             display: block;
         }
 
@@ -164,63 +193,67 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between mb-4 px-1 sticky top-0 z-10 bg-neko-bg py-2">
+            <div class="flex items-center justify-between mb-4 px-1 sticky top-0 z-10 bg-neko-bg py-2 shadow-sm">
                 <h2 class="text-lg font-rounded font-bold"><i class="fas fa-paw text-neko-accent mr-2"></i>Day 1</h2>
                 <span class="text-xs text-gray-400">2026/02/06 (五)</span>
             </div>
             
-            <div class="relative pl-2">
+            <div class="relative pl-2 pb-10">
                 <div class="timeline-line"></div>
 
-                <div id="itinerary-d1" class="relative z-0 space-y-6">
+                <div id="itinerary-d1" class="space-y-6 relative z-10">
                     
-                    <div class="flex gap-4">
+                    <div class="timeline-item flex gap-4" onclick="selectTimeline(this)">
                         <div class="w-12 flex-shrink-0 flex flex-col items-center">
-                            <div class="w-3 h-3 bg-neko-accent rounded-full border-2 border-white shadow"></div>
-                            <span class="text-xs font-mono font-bold mt-1 text-neko-accent">03:30</span>
+                            <div class="time-dot w-3 h-3 rounded-full border-2 border-white shadow"></div>
+                            <span class="time-text text-xs font-mono mt-1">03:30</span>
                         </div>
-                        <div class="bg-orange-50 p-4 rounded-xl shadow-soft flex-1 border border-orange-100 itinerary-item cursor-pointer" onclick="toggleSelect(this)">
-                            <i class="fas fa-paw paw-indicator"></i>
+                        <div class="card-box bg-neko-card p-4 rounded-xl shadow-soft flex-1 relative">
+                            <i class="fas fa-paw paw-indicator text-xl"></i>
                             <h3 class="font-bold text-neko-accent">機場接送出發</h3>
                             <p class="text-xs text-gray-500 mt-1">家裡 -> 桃園機場</p>
+                            <p class="text-[10px] text-orange-400 mt-2 bg-orange-50 inline-block px-2 rounded">記得帶護照!</p>
                         </div>
                     </div>
 
-                    <div class="flex gap-4">
+                    <div class="timeline-item flex gap-4" onclick="selectTimeline(this)">
                         <div class="w-12 flex-shrink-0 flex flex-col items-center">
-                            <div class="w-3 h-3 bg-gray-300 rounded-full border-2 border-white shadow"></div>
-                            <span class="text-xs font-mono text-gray-400 mt-1">12:00</span>
+                            <div class="time-dot w-3 h-3 rounded-full border-2 border-white shadow"></div>
+                            <span class="time-text text-xs font-mono mt-1">12:00</span>
                         </div>
-                        <div class="bg-neko-card p-4 rounded-xl shadow-soft flex-1 itinerary-item cursor-pointer" onclick="toggleSelect(this)">
-                            <i class="fas fa-paw paw-indicator"></i>
+                        <div class="card-box bg-neko-card p-4 rounded-xl shadow-soft flex-1 relative">
+                            <i class="fas fa-paw paw-indicator text-xl"></i>
                             <div class="flex justify-between items-start mb-2">
                                 <h3 class="font-bold">Times Car Rental 取車</h3>
                                 <i class="fas fa-car-side text-gray-300"></i>
                             </div>
                             <p class="text-xs text-gray-500 mb-2">中部國際機場店</p>
-                            <div class="bg-gray-50 p-2 rounded text-[10px] text-gray-500 mb-3 font-mono break-all">
+                            <div class="bg-gray-50 p-2 rounded text-[10px] text-gray-500 mb-3 font-mono break-all border border-gray-100">
                                 〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1
                             </div>
-                            <a href="https://www.google.com/maps/search/?api=1&query=〒479-0881+Aichi,+Tokoname,+Centrair,+1-chōme−1+1" target="_blank" class="block w-full text-center text-xs bg-neko-accent text-white py-2.5 rounded-lg shadow active:scale-95 transition">
+                            <div class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden mb-3 relative border border-gray-200">
+                                <iframe width="100%" height="100%" frameborder="0" scrolling="no" src="https://www.openstreetmap.org/export/embed.html?bbox=136.800,34.850,136.830,34.870&layer=mapnik" style="pointer-events: none;"></iframe>
+                            </div>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Times+Car+Rental+Centrair" target="_blank" class="block w-full text-center text-xs bg-neko-accent text-white py-2.5 rounded-lg shadow active:scale-95 transition">
                                 <i class="fas fa-location-arrow mr-1"></i> 導航前往
                             </a>
                         </div>
                     </div>
 
-                    <div class="flex gap-4">
+                    <div class="timeline-item flex gap-4" onclick="selectTimeline(this)">
                         <div class="w-12 flex-shrink-0 flex flex-col items-center">
-                            <div class="w-3 h-3 bg-gray-300 rounded-full border-2 border-white shadow"></div>
-                            <span class="text-xs font-mono text-gray-600 mt-1 font-bold">13:30</span>
+                            <div class="time-dot w-3 h-3 rounded-full border-2 border-white shadow"></div>
+                            <span class="time-text text-xs font-mono mt-1">13:30</span>
                         </div>
-                        <div class="bg-neko-card p-4 rounded-xl shadow-soft flex-1 itinerary-item cursor-pointer" onclick="toggleSelect(this)">
-                            <i class="fas fa-paw paw-indicator"></i>
+                        <div class="card-box bg-neko-card p-4 rounded-xl shadow-soft flex-1 relative">
+                            <i class="fas fa-paw paw-indicator text-xl"></i>
                             <h3 class="font-bold">JR Gate Tower Mall</h3>
-                            <p class="text-xs text-gray-500 mt-1 mb-1">中餐 & Bic Camera 購物 (停留約3hr)</p>
-                            <div class="flex flex-wrap gap-1 mb-2">
-                                <span class="text-[10px] bg-orange-50 text-orange-400 px-2 py-0.5 rounded">Bic Camera 9F</span>
-                                <span class="text-[10px] bg-orange-50 text-orange-400 px-2 py-0.5 rounded">Uniqlo 11F</span>
+                            <p class="text-xs text-gray-500 mt-1 mb-1">中餐 & Bic Camera 購物 (預計3hr)</p>
+                            <div class="flex flex-wrap gap-1 mb-3">
+                                <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded">Bic Camera 9F</span>
+                                <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded">Uniqlo 11F</span>
                             </div>
-                            <div class="bg-gray-50 p-2 rounded text-[10px] text-gray-500 mb-3 font-mono break-all">
+                            <div class="bg-gray-50 p-2 rounded text-[10px] text-gray-500 mb-3 font-mono break-all border border-gray-100">
                                 1-1-4 Meieki, Nakamura-ku, Nagoya-shi
                             </div>
                             <a href="https://www.google.com/maps/search/?api=1&query=JR+Gate+Tower+Nagoya" target="_blank" class="block w-full text-center text-xs bg-white border border-gray-200 text-gray-600 py-2 rounded-lg hover:bg-gray-50">
@@ -229,13 +262,13 @@
                         </div>
                     </div>
 
-                    <div class="flex gap-4">
+                    <div class="timeline-item flex gap-4" onclick="selectTimeline(this)">
                         <div class="w-12 flex-shrink-0 flex flex-col items-center">
-                            <div class="w-3 h-3 bg-gray-800 rounded-full border-2 border-white shadow"></div>
-                            <span class="text-xs font-mono text-gray-600 mt-1 font-bold">17:40</span>
+                            <div class="time-dot w-3 h-3 rounded-full border-2 border-white shadow"></div>
+                            <span class="time-text text-xs font-mono mt-1">17:40</span>
                         </div>
-                        <div class="bg-neko-card p-4 rounded-xl shadow-soft flex-1 border-l-4 border-gray-800 itinerary-item cursor-pointer" onclick="toggleSelect(this)">
-                            <i class="fas fa-paw paw-indicator"></i>
+                        <div class="card-box bg-neko-card p-4 rounded-xl shadow-soft flex-1 relative border-l-4 border-gray-800">
+                            <i class="fas fa-paw paw-indicator text-xl"></i>
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h3 class="font-bold">鈴鹿賽車樂園酒店</h3>
@@ -244,13 +277,12 @@
                                 <i class="fas fa-bed text-gray-400"></i>
                             </div>
                             <p class="text-xs text-gray-500 mt-1 mb-2">Suzuka Circuit Hotel</p>
-                            <p class="text-[10px] text-gray-400 mb-2 font-mono">〒510-0201 Mie, Suzuka, Inoucho, 7992</p>
                             
-                            <div class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden mb-2 relative">
+                            <div class="w-full h-28 bg-gray-100 rounded-lg overflow-hidden mb-3 relative border border-gray-200">
                                 <iframe width="100%" height="100%" frameborder="0" style="border:0"
                                     src="https://www.openstreetmap.org/export/embed.html?bbox=136.520,34.840,136.540,34.860&layer=mapnik&marker=34.851,136.530">
                                 </iframe>
-                                <div class="absolute inset-0 pointer-events-none shadow-inner"></div>
+                                <div class="absolute inset-0 pointer-events-none shadow-inner bg-black/5"></div>
                             </div>
                             
                             <a href="https://www.google.com/maps/search/?api=1&query=Suzuka+Circuit+Hotel" target="_blank" class="block w-full text-center text-xs bg-gray-800 text-white py-2 rounded-lg shadow hover:bg-gray-700 transition">
@@ -469,15 +501,18 @@
             document.getElementById('main-container').scrollTop = 0;
         }
 
-        // --- Itinerary Selection Logic ---
-        function toggleSelect(element) {
-            // Remove 'selected' from all other siblings
-            const allItems = document.querySelectorAll('.itinerary-item');
-            allItems.forEach(el => {
-                if(el !== element) el.classList.remove('selected');
+        // --- Itinerary Interaction Logic (New) ---
+        function selectTimeline(element) {
+            // 1. Remove 'active' class from all sibling items
+            const parent = element.parentElement;
+            const siblings = parent.querySelectorAll('.timeline-item');
+            siblings.forEach(el => {
+                if(el !== element) el.classList.remove('active');
             });
-            // Toggle clicked
-            element.classList.toggle('selected');
+
+            // 2. Toggle 'active' class on the clicked element
+            // Using toggle allows deselecting if clicked again, or use add() to force selection
+            element.classList.toggle('active');
         }
 
         // --- Wallet Logic ---
@@ -509,7 +544,6 @@
                 }
                 // Allow simple math: 500+200
                 if (/^[0-9+\-*/().\s]*$/.test(val)) {
-                    // Safe evaluation for simple math
                     const totalJpy = Function('"use strict";return (' + val + ')')();
                     twdDisplay.innerText = Math.round(totalJpy * rate).toLocaleString();
                     return totalJpy;
