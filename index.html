@@ -3,22 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tokyo Trip</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>My Travel Mate</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'muji-bg': '#F7F7F2',       /* 米白背景 */
-                        'muji-card': '#FFFFFF',     /* 卡片白 */
-                        'muji-text': '#4A4A4A',     /* 深灰字 */
-                        'muji-accent': '#8E806A',   /* 大地色/卡其 */
-                        'muji-highlight': '#D35B4D',/* 重點紅 */
-                        'muji-nav': '#EFEFEF',      /* 導航列背景 */
+                        'muji-bg': '#F7F7F7',      /* 米白背景 */
+                        'muji-card': '#FFFFFF',    /* 純白卡片 */
+                        'muji-text': '#4A4A4A',    /* 深灰文字 */
+                        'muji-accent': '#8C9E5E',  /* 抹茶綠強調色 */
+                        'muji-secondary': '#D3C4B6'/* 亞麻色 */
                     },
                     fontFamily: {
                         sans: ['"Noto Sans TC"', 'sans-serif'],
@@ -30,12 +33,11 @@
 
     <style>
         body {
-            background-color: #F7F7F2;
+            background-color: #F7F7F7;
             color: #4A4A4A;
             -webkit-tap-highlight-color: transparent;
-            padding-bottom: 80px; /* 預留底部導航高度 */
         }
-        /* 隱藏 Scrollbar 但保持滑動 */
+        /* 隱藏 Scrollbar 但保留功能 */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -43,85 +45,55 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        /* 卡片通用樣式 */
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-            transition: transform 0.1s;
+        /* 底部導航欄特效 */
+        .nav-item.active {
+            color: #8C9E5E;
         }
-        .card:active {
-            transform: scale(0.98);
+        .nav-item.active i {
+            transform: translateY(-2px);
         }
-        /* Tab 切換動畫 */
-        .tab-content {
+        /* 頁面切換動畫 */
+        .page-section {
             display: none;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.3s ease-in-out;
+            padding-bottom: 100px; /* 避免被導航欄遮擋 */
         }
-        .tab-content.active {
+        .page-section.active {
             display: block;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* 輸入框樣式 */
-        .input-clean {
-            border: 1px solid #E5E7EB;
-            border-radius: 8px;
-            padding: 12px;
-            width: 100%;
-            outline: none;
-            background: #F9FAFB;
-            transition: border-color 0.2s;
-        }
-        .input-clean:focus {
-            border-color: #8E806A;
-            background: #FFF;
+        /* 時間軸樣式 */
+        .timeline-line {
+            position: absolute;
+            left: 1rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #E5E5E5;
+            z-index: 0;
         }
     </style>
 </head>
-<body class="font-sans antialiased text-muji-text">
+<body class="font-sans antialiased h-screen flex flex-col overflow-hidden">
 
-    <header class="fixed top-0 left-0 right-0 bg-muji-bg/95 backdrop-blur-sm z-40 px-6 py-4 shadow-sm border-b border-gray-200 flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-widest text-muji-accent" id="page-title">TOKYO PLAN</h1>
-        <div class="text-xs text-gray-400 font-mono">5 DAYS</div>
+    <header class="bg-muji-card shadow-sm px-6 py-4 flex justify-between items-center z-20">
+        <div>
+            <h1 class="text-xl font-bold text-muji-accent tracking-widest">TRAVEL LOG</h1>
+            <p class="text-xs text-gray-400" id="current-date">Loading...</p>
+        </div>
+        <div class="text-right">
+            <span class="text-xs bg-gray-200 px-2 py-1 rounded text-gray-500">
+                <i class="fas fa-map-marker-alt mr-1"></i>日本
+            </span>
+        </div>
     </header>
 
-    <main class="pt-20 px-4 max-w-2xl mx-auto">
+    <main class="flex-1 overflow-y-auto no-scrollbar p-4 relative" id="main-container">
         
-        <div id="view-plan" class="tab-content active">
-            <div class="card p-5 mb-6 border-l-4 border-muji-accent relative overflow-hidden">
-                <i class="fa-solid fa-plane text-gray-100 absolute -right-5 -top-5 text-9xl pointer-events-none"></i>
-                <h3 class="text-sm font-bold text-gray-400 uppercase mb-3 relative z-10">Flight Info</h3>
-                <div class="flex justify-between items-center mb-4 relative z-10">
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-gray-700">TPE</div>
-                        <div class="text-xs text-gray-500 mt-1" id="flight-out-date">--/--</div>
-                    </div>
-                    <div class="flex flex-col items-center px-4">
-                        <i class="fa-solid fa-plane text-muji-accent text-lg"></i>
-                        <div class="h-[1px] w-12 bg-gray-300 my-1"></div>
-                        <span class="text-[10px] text-gray-400">2h 30m</span>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-gray-700">NRT</div>
-                        <div class="text-xs text-gray-500 mt-1" id="flight-in-date">--/--</div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 p-3 rounded-lg text-xs text-gray-600 relative z-10">
-                    <div class="flex justify-between mb-1">
-                        <span>去程</span>
-                        <span class="font-bold" id="flight-out-detail">載入中...</span>
-                    </div>
-                    <div class="flex justify-between border-t border-gray-200 pt-1">
-                        <span>回程</span>
-                        <span class="font-bold" id="flight-in-detail">載入中...</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card p-4 mb-6 flex items-start gap-4">
-                <div class="bg-muji-accent/10 p-3 rounded-full text-muji-accent shrink-0">
-                    <i class="fa-solid fa-hotel text-xl"></i>
-                </div>
+        <section id="plan" class="page-section active">
+            <div class="bg-muji-card rounded-xl p-5 shadow-sm mb-6 border-l-4 border-muji-secondary">
+                <h2 class="text-lg font-bold mb-3"><i class="fas fa-plane text-muji-secondary mr-2"></i>航班資訊</h2>
+                <div class="flex justify-between items-center mb-2">
