@@ -123,6 +123,17 @@
             border-radius: 0.75rem;
             overflow: hidden;
             border: 1px solid #eee;
+            position: relative;
+        }
+        .scroll-indicator {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
         }
 
         /* 輸入框樣式 */
@@ -198,17 +209,17 @@
                 d1: [
                     { id: 'd1-1', time: '03:00', title: '機場接送', desc: '家裡 -> 桃園機場', type: 'transport', highlight: true },
                     { id: 'd1-2', time: '07:35', title: '起飛 CI 0154', desc: '飛往名古屋', type: 'flight' },
-                    { id: 'd1-3', time: '11:05', title: '抵達名古屋', desc: '中部國際機場\n(入境+領行李約1hr)', type: 'arrival' },
-                    { id: 'd1-4', time: '12:00', title: '取車', desc: '停留：30分鐘\nCentrair, 1-chōme−1', type: 'car', addr: '〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一, 日本' },
+                    { id: 'd1-3', time: '11:05', title: '抵達名古屋', desc: '中部國際機場', type: 'arrival' },
+                    { id: 'd1-4', time: '12:00', title: '取車', desc: '停留：30分鐘\n地址：〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一', type: 'car', addr: '〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一, 日本' },
                     { id: 'd1-5', time: '13:30', title: 'JR Gate Tower Mall', desc: '停留：3小時\n★午餐 & 逛 Bic Camera\n★導航請輸入電話: 052-586-7811', type: 'shop', addr: '1 Chome-26-34 Meiekiminami, Nakamura Ward, Nagoya, Aichi 450-0003日本' },
-                    { id: 'd1-6', time: '18:00', title: '住宿：鈴鹿賽道樂園酒店', desc: '★含早晚餐\n★含4張樂園護照 & 貴賓室卷', type: 'hotel', addr: '7992 Inoucho, Suzuka, Mie 510-0201日本' },
+                    { id: 'd1-6', time: '18:00', title: '住宿：鈴鹿賽道樂園酒店', desc: '★北棟賽車房 | 含早晚餐\n★含4張樂園護照 & 貴賓室卷', type: 'hotel', addr: '鈴鹿サーキット駐車場 M2, 日本〒510-0201 Mie, Suzuka, Inoucho, 7992' },
                     { id: 'd1-7', time: '19:30', title: '晚餐', desc: '飯店自助晚餐', type: 'food' }
                 ],
                 d2: [
                     { id: 'd2-1', time: '07:00', title: '早餐', desc: '飯店自助早餐', type: 'food' },
                     { id: 'd2-2', time: '09:30', title: '鈴鹿賽車樂園', desc: '★記得拿中文地圖\n★掃QR看排隊時間', type: 'play', highlight: true },
-                    { id: 'd2-3', time: '12:00', title: '午餐：GRAN VIEW', desc: '樂園內餐廳', type: 'food' },
-                    { id: 'd2-4', time: '13:10', title: '賽道挑戰者', desc: '★停留：40分鐘\n★憑乘車卷x3 (Hotmail信件)', type: 'play', highlight: true },
+                    { id: 'd2-3', time: '13:10', title: '賽道挑戰者', desc: '★停留：40分鐘\n★憑乘車卷x3 (Hotmail信件)', type: 'play', highlight: true },
+                    { id: 'd2-4', time: '14:00', title: '午餐：GRAN VIEW', desc: '樂園內餐廳 (玩完賽道挑戰者再吃)', type: 'food' },
                     { id: 'd2-5', time: '17:00', title: '離開樂園', desc: '前往晚餐 (車程約1hr)', type: 'transport' },
                     { id: 'd2-6', time: '18:00', title: '晚餐：萬來亭', desc: '停留：1小時\n名古屋市緑區作の山町', type: 'food', addr: '日本〒458-0038 Aichi, Nagoya, Midori Ward, Sakunoyamacho, 230 メゾン作の山 １' },
                     { id: 'd2-7', time: '19:30', title: '住宿：Airbnb', desc: '愛知縣名古屋市緑區', type: 'hotel', addr: '愛知縣名古屋市緑區鳴海町字作町26號' }
@@ -367,6 +378,14 @@
                 "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-3.png",
                 "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-4.png"
             ];
+            
+            const suzukaImages = [
+                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-1.png",
+                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-2.png",
+                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-3.png"
+            ];
+
+            const loginUrl = "https://d-reserve.jp/auth/realms/M000000678/protocol/openid-connect/auth?response_type=code&client_id=directin-s4&redirect_uri=https%3A%2F%2Fd-reserve.jp%2Fguest-reserve-front%2Fsso%2Flogin?hotelCode%3D0000001590%26return_url%3Dhttps%253A%252F%252Fd-reserve.jp%252Fauth%252Frealms%252Fdirectin-s4%252Fcdp%252Fgroups%252FM000000678%252Fredirects%252Faccount%253Freferrer_uri%253Dhttps%25253A%25252F%25252Fd-reserve.jp%25252FGSEA001F01300%25252FGSEA001A01%25253FhotelCode%25253D0000001590%252526lang%25253Den&state=faadacc5-08c9-485f-972f-9681fbea58dd&login=true&ui_locales=en&scope=openid";
 
             container.innerHTML = `
             <div class="p-6 space-y-8">
@@ -382,17 +401,18 @@
 
                     <div class="bg-gray-50 border-y border-gray-100 p-4">
                          <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
-                            <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>停車場入口指引
+                            <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>停車場入口 (一般/南口)
                         </h3>
                         
                         <div class="scroll-gallery no-scrollbar">
-                            ${parkingImages.map(img => `
+                            ${parkingImages.map((img, i) => `
                                 <div class="scroll-item shadow-sm">
                                     <img src="${img}" class="w-full h-40 object-cover" onclick="showFullImage('${img}')">
+                                    <div class="scroll-indicator">${i+1}/4</div>
                                 </div>
                             `).join('')}
                         </div>
-                        <div class="text-center text-[10px] text-gray-400 mt-2"><i class="fa-solid fa-left-right mr-1"></i>左右滑動查看入口示意圖</div>
+                        <div class="text-center text-[10px] text-gray-400 mt-2"><i class="fa-solid fa-left-right mr-1"></i>左右滑動查看示意圖</div>
                     </div>
                     
                     <div class="p-6 space-y-6">
@@ -438,6 +458,40 @@
                         </div>
                     </div>
                 </div>
+
+                 <div class="bg-white rounded-3xl overflow-hidden shadow-soft">
+                    <div class="p-6 pb-2">
+                        <span class="guide-tag">Hotel</span>
+                        <h2 class="text-2xl font-black text-muji-text mt-2">鈴鹿賽道樂園酒店</h2>
+                    </div>
+
+                    <div class="bg-gray-50 border-y border-gray-100 p-4">
+                         <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
+                            <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>住宿者專用停車場
+                        </h3>
+                         <div class="scroll-gallery no-scrollbar">
+                            ${suzukaImages.map((img, i) => `
+                                <div class="scroll-item shadow-sm">
+                                    <img src="${img}" class="w-full h-40 object-cover" onclick="showFullImage('${img}')">
+                                    <div class="scroll-indicator">${i+1}/3</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="text-center text-[10px] text-gray-400 mt-2"><i class="fa-solid fa-left-right mr-1"></i>左右滑動查看示意圖</div>
+                    </div>
+
+                    <div class="p-6 space-y-4">
+                         <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-sm leading-relaxed">
+                            <p class="font-bold text-cat-orange mb-2"><i class="fa-solid fa-bell mr-1"></i>Check-in 重要須知</p>
+                            <p class="text-gray-700 mb-2">櫃台位於<span class="font-bold">「主棟」</span>。</p>
+                            <p class="text-gray-600 text-xs">即使住宿於 West 或 North 棟，辦理入住時也請先至主棟內的飯店櫃台。工作人員會再次為您指引住宿棟附近的停車場。</p>
+                        </div>
+                        
+                        <a href="${loginUrl}" target="_blank" class="block w-full bg-muji-text text-white text-center font-bold py-3 rounded-xl shadow-lg hover:bg-black transition-colors">
+                            <i class="fa-solid fa-right-to-bracket mr-2"></i>飯店登入 (Check-in)
+                        </a>
+                    </div>
+                </div>
             </div>`;
         }
 
@@ -459,7 +513,7 @@
 
                     <div class="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
                         <div class="flex gap-2">
-                            <input type="text" id="calc-input" placeholder="輸入算式 (如 500+200*3)" class="flex-1 bg-transparent text-white placeholder-white/50 outline-none font-mono text-lg">
+                            <input type="text" id="calc-input" placeholder="輸入算式 (如 500+200*3)" class="flex-1 bg-transparent text-white placeholder-white/50 outline-none font-mono text-lg" onkeydown="handleCalcKey(event)">
                             <button onclick="calculate()" class="text-white font-bold w-8"><i class="fa-solid fa-equals"></i></button>
                         </div>
                         <div id="calc-result" class="text-right text-2xl font-bold mt-2 h-8">0</div>
@@ -516,6 +570,14 @@
             walletRate = parseFloat(val);
             localStorage.setItem('trip_rate', walletRate);
             renderWallet(document.getElementById('app-content'));
+        }
+
+        function handleCalcKey(event) {
+            if (event.key === 'Enter') {
+                calculate();
+                // Close Keyboard
+                event.target.blur();
+            }
         }
 
         function calculate() {
