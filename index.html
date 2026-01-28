@@ -3,83 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Travel Companion App</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>NAGOYA 2026 🐈</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#D97706', // 琥珀色 (重點色)
-                        secondary: '#F3F4F6', // 淺灰 (背景)
-                        accent: '#78350F', // 深棕 (文字)
-                        paper: '#FFFFFF', // 卡片白
+                        'muji-bg': '#F9F9F4',       /* 米白紙張色 */
+                        'muji-gray': '#F2F2EB',     /* 淺灰區塊 */
+                        'cat-orange': '#E06C38',    /* 深橘貓色 */
+                        'cat-dark': '#594A42',      /* 深褐文字 */
+                        'cat-light': '#FFF0E6',     /* 淺橘背景 */
                     },
                     fontFamily: {
-                        sans: ['Noto Sans TC', 'sans-serif'],
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 15px rgba(224, 108, 56, 0.08)',
+                        'card': '0 2px 8px rgba(0,0,0,0.04)',
                     }
                 }
             }
         }
     </script>
-    <style>
-        /* 隱藏捲軸但保留功能 */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        body { -webkit-tap-highlight-color: transparent; }
-        
-        /* 頁面切換動畫 */
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 底部導覽列選中狀態 */
-        .nav-active { color: #D97706; }
-        .nav-inactive { color: #9CA3AF; }
+    <style>
+        body {
+            background-color: #F9F9F4;
+            color: #594A42;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 90px; /* Space for bottom nav */
+        }
+        
+        /* 隱藏 Scrollbar 但保持滑動機能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* 貓咪耳朵形狀的 Tab */
+        .nav-active {
+            color: #E06C38;
+            position: relative;
+        }
+        .nav-active::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid #E06C38;
+        }
+
+        /* Input Reset */
+        .input-reset {
+            appearance: none;
+            outline: none;
+            border: 1px solid #E5E7EB;
+            transition: all 0.2s;
+        }
+        .input-reset:focus {
+            border-color: #E06C38;
+            background-color: #FFF;
+            box-shadow: 0 0 0 3px rgba(224, 108, 56, 0.1);
+        }
+
+        /* 卡片動畫 */
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="bg-secondary text-gray-700 font-sans h-screen flex flex-col overflow-hidden">
+<body class="font-sans antialiased">
 
-    <header class="bg-paper shadow-sm px-4 py-3 z-10 flex justify-between items-center shrink-0">
-        <h1 class="text-xl font-bold text-accent tracking-widest">TRIP<span class="text-primary">2026</span></h1>
-        <div id="header-status" class="text-xs font-medium bg-gray-100 px-2 py-1 rounded-full text-gray-500">
-            東京・六天五夜
+    <header class="fixed top-0 w-full z-40 bg-muji-bg/95 backdrop-blur-md border-b border-orange-100 shadow-sm transition-all duration-300">
+        <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-center relative">
+            <div class="absolute left-4 text-cat-orange text-2xl">
+                <i class="fa-solid fa-cat"></i>
+            </div>
+            <h1 class="text-lg font-bold tracking-widest text-cat-dark">NAGOYA <span class="text-cat-orange">2026</span></h1>
+            <div class="absolute right-4 text-cat-dark/50 text-xs font-mono">
+                FEB 06-14
+            </div>
         </div>
     </header>
 
-    <main id="main-container" class="flex-1 overflow-y-auto no-scrollbar p-4 pb-24 relative">
-        
-        <section id="view-plan" class="view-section fade-in">
-            <div class="bg-paper rounded-xl p-4 shadow-sm mb-6 border-l-4 border-primary">
-                <h2 class="font-bold text-lg mb-2 text-accent"><i class="fa-solid fa-plane-departure mr-2"></i>航班資訊</h2>
-                <div class="flex justify-between items-center text-sm mb-2">
-                    <div>
-                        <span class="block text-gray-400 text-xs">去程 (TPE -> NRT)</span>
-                        <span class="font-bold text-lg">BR198</span>
-                        <div class="text-primary font-medium">08:50 - 13:15</div>
-                    </div>
-                    <div class="text-center text-gray-300"><i class="fa-solid fa-arrow-right"></i></div>
-                    <div class="text-right">
-                        <span class="block text-gray-400 text-xs">回程 (NRT -> TPE)</span>
-                        <span class="font-bold text-lg">BR197</span>
-                        <div class="text-primary font-medium">14:15 - 17:00</div>
-                    </div>
+    <main class="max-w-md mx-auto pt-20 px-4">
+
+        <section id="view-plan" class="view-section block fade-in">
+            <div class="bg-white rounded-xl p-4 mb-6 shadow-card border-l-4 border-cat-orange relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 text-gray-100 text-6xl rotate-12">
+                    <i class="fa-solid fa-plane"></i>
                 </div>
-                <div class="border-t border-gray-100 mt-2 pt-2">
-                    <p class="text-xs text-gray-500"><i class="fa-solid fa-bed mr-1"></i>住宿：上野站前 APA Hotel (APA Hotel Ueno Ekimae)</p>
-                    <p class="text-xs text-gray-500 mt-1"><i class="fa-solid fa-map-pin mr-1"></i>地址：東京都台東區上野 1-2-3</p>
+                <div class="relative z-10">
+                    <h3 class="text-xs font-bold text-cat-orange mb-2 tracking-wider">FLIGHT INFO</h3>
+                    <div class="flex justify-between items-center mb-3 pb-3 border-b border-dashed border-gray-200">
+                        <div>
+                            <div class="text-2xl font-bold">TPE</div>
+                            <div class="text-xs text-gray-400">07:35</div>
+                        </div>
+                        <div class="text-center flex-1 px-2">
+                            <div class="text-xs text-cat-orange font-bold">CI 0154</div>
+                            <div class="h-[1px] bg-cat-orange w-full my-1 relative">
+                                <i class="fa-solid fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-cat-orange text-xs bg-white px-1"></i>
+                            </div>
+                            <div class="text-xs text-gray-400">2h 30m</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold">NGO</div>
+                            <div class="text-xs text-gray-400">11:05</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="text-xl font-bold text-gray-600">NGO</div>
+                            <div class="text-xs text-gray-400">09:50</div>
+                        </div>
+                        <div class="text-center flex-1 px-2">
+                            <div class="text-xs text-gray-400">CI 0151</div>
+                            <div class="h-[1px] bg-gray-300 w-full my-1"></div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-bold text-gray-600">TPE</div>
+                            <div class="text-xs text-gray-400">12:15</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar" id="day-tabs">
+            <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6 pb-2">
+                <button onclick="renderDay(1)" class="day-btn active flex-shrink-0 w-14 h-16 rounded-xl bg-cat-orange text-white flex flex-col items-center justify-center shadow-soft transition-transform transform active:scale-95">
+                    <span class="text-xs opacity-80">D1</span>
+                    <span class="font-bold text-lg">06</span>
+                </button>
+                <button onclick="alert('範例：切換至 Day 2')" class="day-btn flex-shrink-0 w-14 h-16 rounded-xl bg-white text-gray-400 flex flex-col items-center justify-center border border-gray-100">
+                    <span class="text-xs">D2</span>
+                    <span class="font-bold text-lg">07</span>
+                </button>
+                 <button onclick="alert('範例：切換至 Day 3')" class="day-btn flex-shrink-0 w-14 h-16 rounded-xl bg-white text-gray-400 flex flex-col items-center justify-center border border-gray-100">
+                    <span class="text-xs">D3</span>
+                    <span class="font-bold text-lg">08</span>
+                </button>
                 </div>
 
             <div id="itinerary-list" class="space-y-4">
@@ -87,70 +167,78 @@
         </section>
 
         <section id="view-guide" class="view-section hidden fade-in">
-            <h2 class="text-2xl font-bold text-accent mb-4 border-b-2 border-primary inline-block pb-1">深度導覽</h2>
+            <h2 class="text-2xl font-bold mb-4 text-cat-dark border-b-4 border-cat-orange inline-block">TRAVEL GUIDE</h2>
             
-            <article class="bg-paper rounded-xl shadow-sm overflow-hidden mb-6">
-                <div class="h-40 bg-gray-200 relative">
-                    <img src="https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover">
-                    <div class="absolute bottom-0 left-0 bg-gradient-to-t from-black/70 to-transparent w-full p-3 pt-10">
-                        <h3 class="text-white font-bold text-lg">淺草寺的秘密</h3>
+            <div class="space-y-6">
+                <div class="bg-white rounded-xl overflow-hidden shadow-card">
+                    <div class="h-40 bg-gray-200 relative group cursor-pointer" onclick="alert('地圖載入中...')">
+                        <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.openstreetmap.org/export/embed.html?bbox=136.525,34.840,136.545,34.855&amp;layer=mapnik" style="border: 1px solid black"></iframe>
+                        <div class="absolute bottom-2 right-2 bg-white/90 text-xs px-2 py-1 rounded shadow">
+                            <i class="fa-solid fa-map-location-dot text-cat-orange"></i> 鈴鹿賽車樂園
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-cat-orange text-white text-[10px] px-2 py-0.5 rounded-full tracking-wide">景點</span>
+                            <h3 class="font-bold text-lg">鈴鹿賽車樂園 (Suzuka Circuit)</h3>
+                        </div>
+                        <p class="text-sm text-gray-500 leading-relaxed text-justify mb-3">
+                            日本最著名的 F1 賽道之一。除了觀看賽事，這裡還有名為「Motopia」的遊樂園，許多設施都以駕駛體驗為主題，非常適合親子同樂。
+                        </p>
+                        <div class="bg-cat-light p-3 rounded-lg text-xs text-cat-dark/80">
+                            <strong class="text-cat-orange">💡 小冷知識：</strong> 這裡的摩天輪是全日本唯一可以在車廂內看到 F1 賽道全景的地方喔！
+                        </div>
                     </div>
                 </div>
-                <div class="p-4">
-                    <p class="text-sm text-gray-600 leading-relaxed mb-3">
-                        你知道嗎？雷門的大燈籠重達 700 公斤！淺草寺創建於西元 628 年，是東京最古老的寺廟。求籤時如果抽到「凶」，記得要把籤詩綁在旁邊的架子上，象徵把壞運氣留在寺廟裡化解，不要帶回家喔。
-                    </p>
-                    <button onclick="window.open('https://www.google.com/maps/search/?api=1&query=Sensoji+Temple')" class="w-full py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition">
-                        <i class="fa-solid fa-map-location-dot mr-1"></i> Google Maps
-                    </button>
-                </div>
-            </article>
 
-            <div class="bg-paper rounded-xl p-2 shadow-sm mb-6">
-                 <h3 class="font-bold text-gray-800 mb-2 px-2">迪士尼樂園地圖</h3>
-                 <iframe width="100%" height="300" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.openstreetmap.org/export/embed.html?bbox=139.8708%2C35.6256%2C139.8929%2C35.6378&amp;layer=mapnik" style="border-radius: 8px;"></iframe>
-                 <small class="block text-right mt-1 text-gray-400 text-xs">OpenStreetMap View</small>
+                <div class="bg-white rounded-xl p-5 shadow-card">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full tracking-wide">美食</span>
+                        <h3 class="font-bold text-lg">名古屋流早餐</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 leading-relaxed text-justify">
+                        名古屋有獨特的「點飲料送早餐」文化（Morning Service）。只要在早上前往喫茶店點一杯咖啡，通常會附贈吐司與水煮蛋，一定要體驗！
+                    </p>
+                </div>
             </div>
         </section>
 
         <section id="view-wallet" class="view-section hidden fade-in">
-            <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-4 text-white shadow-lg mb-6 sticky top-0 z-20">
-                <div class="flex justify-between items-end mb-2">
-                    <label class="text-xs text-gray-400">目前匯率 (JPY -> TWD)</label>
-                    <input type="number" id="exchange-rate" value="0.22" class="bg-gray-700 text-white text-right w-16 text-xs p-1 rounded border-none focus:ring-1 focus:ring-primary" onchange="saveSettings()">
-                </div>
-                
-                <div class="text-right mb-4">
-                    <div class="text-3xl font-bold tracking-wider" id="display-jpy">¥0</div>
-                    <div class="text-sm text-gray-400" id="display-twd">NT$0</div>
-                </div>
-
-                <div class="grid grid-cols-4 gap-2 mb-2">
-                    <input type="text" id="expense-name" placeholder="品項名稱 (如: 拉麵)" class="col-span-4 bg-gray-700 border-none rounded p-2 text-white text-sm placeholder-gray-500">
-                    
-                    <div class="col-span-3 relative">
-                         <input type="text" id="expense-calc" placeholder="金額或算式 (如: 500+200)" class="w-full bg-gray-700 border-none rounded p-2 text-white text-lg font-mono placeholder-gray-600">
+            <div class="bg-cat-dark text-white rounded-xl p-5 mb-6 shadow-soft">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-xs opacity-60">目前匯率 (JPY -> TWD)</p>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-lg">0.</span>
+                            <input type="number" id="exchange-rate" value="215" class="bg-transparent text-2xl font-bold w-16 border-b border-white/30 focus:border-cat-orange outline-none text-center">
+                        </div>
                     </div>
-                    
-                    <label class="bg-gray-600 rounded flex items-center justify-center cursor-pointer active:bg-gray-500">
-                        <i class="fa-solid fa-camera"></i>
-                        <input type="file" id="expense-img" accept="image/*" capture="environment" class="hidden" onchange="handleImagePreview(this)">
-                    </label>
+                    <div class="text-right">
+                        <p class="text-xs opacity-60">總支出 (NTD)</p>
+                        <p class="text-3xl font-bold text-cat-orange" id="total-twd">0</p>
+                    </div>
                 </div>
                 
-                <button onclick="addExpense()" class="w-full bg-primary py-2 rounded font-bold text-white hover:bg-amber-600 active:scale-95 transition shadow-lg shadow-orange-900/20">
-                    <i class="fa-solid fa-plus mr-1"></i> 加入記帳
-                </button>
-                
-                <div id="img-preview-area" class="hidden mt-2 relative inline-block">
-                    <img id="img-preview" class="h-16 w-16 object-cover rounded border border-white/20">
-                    <button onclick="clearImage()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"><i class="fa-solid fa-times"></i></button>
+                <div class="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="expense-item" placeholder="品項 (如: 拉麵)" class="w-2/3 bg-transparent border-b border-gray-500 text-white placeholder-gray-400 focus:border-cat-orange outline-none py-1">
+                        <label class="w-1/3 flex items-center justify-center bg-white/20 rounded cursor-pointer hover:bg-white/30 transition">
+                            <i class="fa-solid fa-camera text-sm mr-1"></i> <span class="text-xs">相片</span>
+                            <input type="file" id="expense-photo" accept="image/*" class="hidden" capture="environment">
+                        </label>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="expense-amount" placeholder="金額 (可輸入 500+200)" class="flex-1 bg-transparent border-b border-gray-500 text-white placeholder-gray-400 focus:border-cat-orange outline-none py-1 text-lg font-mono">
+                        <button onclick="addExpense()" class="bg-cat-orange text-white px-4 py-1 rounded font-bold shadow-lg active:scale-95 transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex justify-between items-center mb-2 px-1">
-                <h3 class="font-bold text-gray-700">消費紀錄</h3>
-                <span class="text-xs text-gray-500" id="total-expense">總計: ¥0</span>
+            <div class="flex justify-between items-end mb-2 px-1">
+                <h3 class="font-bold text-gray-400 text-sm">SPENDING HISTORY</h3>
+                <button onclick="clearExpenses()" class="text-xs text-red-300 underline">重置</button>
             </div>
             
             <div id="expense-list" class="space-y-3 pb-20">
@@ -158,433 +246,366 @@
         </section>
 
         <section id="view-lists" class="view-section hidden fade-in">
-            <div class="flex mb-4 bg-gray-200 rounded-lg p-1">
-                <button onclick="switchListTab('check')" id="btn-tab-check" class="flex-1 py-1 text-sm rounded-md bg-white shadow text-primary font-bold transition">行前 Check</button>
-                <button onclick="switchListTab('memo')" id="btn-tab-memo" class="flex-1 py-1 text-sm rounded-md text-gray-500 font-medium transition">備忘錄</button>
+            <div class="mb-8">
+                <h2 class="text-lg font-bold mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-suitcase-rolling text-cat-orange"></i> 行前檢查
+                </h2>
+                <div id="checklist-container" class="space-y-2">
+                    </div>
             </div>
 
-            <div id="list-check-content">
-                <div class="bg-paper rounded-xl p-4 shadow-sm mb-4">
-                    <h3 class="font-bold text-gray-800 mb-3 border-l-4 border-primary pl-2">必備證件</h3>
-                    <ul class="space-y-2" id="checklist-docs">
-                        </ul>
+            <div>
+                <h2 class="text-lg font-bold mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-note-sticky text-cat-orange"></i> 備忘錄 (Memo)
+                </h2>
+                <div class="bg-white rounded-xl shadow-card p-4">
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="memo-input" placeholder="輸入文字或網址..." class="input-reset flex-1 rounded-lg px-3 py-2 bg-muji-bg">
+                        <button onclick="addMemo()" class="bg-gray-200 w-10 rounded-lg text-gray-600 hover:bg-cat-orange hover:text-white transition"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div id="memo-list" class="space-y-2">
+                        </div>
                 </div>
-                <div class="bg-paper rounded-xl p-4 shadow-sm">
-                    <h3 class="font-bold text-gray-800 mb-3 border-l-4 border-gray-400 pl-2">生活用品</h3>
-                    <ul class="space-y-2" id="checklist-items">
-                         </ul>
-                </div>
-            </div>
-
-            <div id="list-memo-content" class="hidden h-full flex flex-col">
-                <textarea id="memo-pad" class="w-full flex-1 bg-paper rounded-xl p-4 shadow-sm border-none resize-none focus:ring-2 focus:ring-primary text-gray-700 leading-relaxed" placeholder="在這裡輸入筆記、網址... (輸入網址會自動變成連結)"></textarea>
-                <div class="text-xs text-gray-400 mt-2 text-center">自動儲存中...</div>
-                
-                <div id="memo-links" class="mt-4 space-y-2"></div>
             </div>
         </section>
 
         <section id="view-info" class="view-section hidden fade-in">
-            <h2 class="text-xl font-bold text-gray-800 mb-4 px-2">實用資訊</h2>
-            
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <a href="https://www.jma.go.jp/bosai/forecast/" target="_blank" class="bg-blue-50 p-4 rounded-xl text-center border border-blue-100 active:bg-blue-100">
-                    <i class="fa-solid fa-cloud-sun text-2xl text-blue-500 mb-2"></i>
-                    <div class="text-sm font-bold text-blue-800">天氣預報</div>
-                    <div class="text-xs text-blue-400">日本氣象廳</div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <a href="https://www.jma.go.jp/bosai/forecast/" target="_blank" class="bg-blue-50 p-4 rounded-xl flex flex-col items-center justify-center gap-2 shadow-sm border border-blue-100 hover:bg-blue-100 transition">
+                    <i class="fa-solid fa-cloud-sun-rain text-3xl text-blue-400"></i>
+                    <span class="font-bold text-blue-800 text-sm">天氣預報</span>
                 </a>
-                 <a href="https://www.google.com/maps/search/police" target="_blank" class="bg-red-50 p-4 rounded-xl text-center border border-red-100 active:bg-red-100">
-                    <i class="fa-solid fa-shield-halved text-2xl text-red-500 mb-2"></i>
-                    <div class="text-sm font-bold text-red-800">緊急求助</div>
-                    <div class="text-xs text-red-400">警察 (110)</div>
+                <a href="https://www.google.com/maps/search/drugstore" target="_blank" class="bg-green-50 p-4 rounded-xl flex flex-col items-center justify-center gap-2 shadow-sm border border-green-100 hover:bg-green-100 transition">
+                    <i class="fa-solid fa-cart-shopping text-3xl text-green-400"></i>
+                    <span class="font-bold text-green-800 text-sm">附近藥妝</span>
                 </a>
             </div>
 
-            <div class="bg-paper rounded-xl p-5 shadow-sm space-y-4">
-                <div class="flex items-start">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-1 mr-3"></i>
-                    <div>
-                        <h4 class="font-bold text-gray-800">旅遊禁忌</h4>
-                        <p class="text-sm text-gray-600 mt-1">日本電車內請將手機設為靜音，避免通話。搭乘手扶梯時東京靠左站立（大阪靠右）。</p>
-                    </div>
-                </div>
-                <hr class="border-gray-100">
-                 <div class="flex items-start">
-                    <i class="fa-solid fa-passport text-blue-500 mt-1 mr-3"></i>
-                    <div>
-                        <h4 class="font-bold text-gray-800">遺失護照</h4>
-                        <p class="text-sm text-gray-600 mt-1">台北駐日經濟文化代表處<br>電話：03-3280-7811<br>地址：東京都港區白金台 5-20-2</p>
-                    </div>
-                </div>
+            <div class="bg-white rounded-xl p-5 shadow-card border-l-4 border-red-400 mb-6">
+                <h3 class="font-bold text-red-500 mb-3"><i class="fa-solid fa-triangle-exclamation"></i> 緊急聯絡</h3>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex justify-between border-b border-gray-100 pb-1"><span>👮 警察局</span> <span class="font-mono font-bold">110</span></li>
+                    <li class="flex justify-between border-b border-gray-100 pb-1"><span>🚑 救護車/火警</span> <span class="font-mono font-bold">119</span></li>
+                    <li class="flex justify-between"><span>🇹🇼 駐日代表處</span> <span class="font-mono font-bold">080-1009-7179</span></li>
+                </ul>
+            </div>
+
+            <div class="bg-cat-light rounded-xl p-5 shadow-sm">
+                <h3 class="font-bold text-cat-orange mb-3">🐱 旅遊小貼士</h3>
+                <ul class="list-disc pl-5 text-sm text-gray-600 space-y-2">
+                    <li>日本電車內請保持安靜，手機調成震動。</li>
+                    <li>購物滿 5500 日圓可退稅，記得帶護照。</li>
+                    <li>名古屋炸雞翅與鰻魚飯三吃是必吃美食！</li>
+                </ul>
             </div>
         </section>
 
     </main>
 
-    <nav class="bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.05)] h-20 pb-4 pt-2 px-2 flex justify-around items-center shrink-0 z-50">
-        <button onclick="switchView('plan')" class="nav-btn w-16 text-center group" data-target="plan">
-            <div class="text-xl mb-1 group-active:scale-90 transition"><i class="fa-solid fa-calendar-days"></i></div>
-            <div class="text-[10px] font-medium">行程</div>
-        </button>
-        <button onclick="switchView('guide')" class="nav-btn w-16 text-center group" data-target="guide">
-            <div class="text-xl mb-1 group-active:scale-90 transition"><i class="fa-solid fa-book-open"></i></div>
-            <div class="text-[10px] font-medium">導覽</div>
-        </button>
-        <button onclick="switchView('wallet')" class="nav-btn w-16 text-center group" data-target="wallet">
-            <div class="h-12 w-12 bg-primary text-white rounded-full flex items-center justify-center text-xl shadow-lg -mt-6 mx-auto group-active:translate-y-1 transition">
-                <i class="fa-solid fa-calculator"></i>
-            </div>
-            <div class="text-[10px] font-medium mt-1">記帳</div>
-        </button>
-        <button onclick="switchView('lists')" class="nav-btn w-16 text-center group" data-target="lists">
-            <div class="text-xl mb-1 group-active:scale-90 transition"><i class="fa-solid fa-list-check"></i></div>
-            <div class="text-[10px] font-medium">清單</div>
-        </button>
-        <button onclick="switchView('info')" class="nav-btn w-16 text-center group" data-target="info">
-            <div class="text-xl mb-1 group-active:scale-90 transition"><i class="fa-solid fa-circle-info"></i></div>
-            <div class="text-[10px] font-medium">資訊</div>
-        </button>
+    <nav class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 pb-safe-area z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+        <div class="flex justify-around items-center h-16 max-w-md mx-auto">
+            <button onclick="switchTab('plan')" class="nav-btn nav-active flex flex-col items-center gap-1 w-1/5 text-gray-400" data-target="plan">
+                <i class="fa-solid fa-calendar-days text-xl"></i>
+                <span class="text-[10px] font-bold">行程</span>
+            </button>
+            <button onclick="switchTab('guide')" class="nav-btn flex flex-col items-center gap-1 w-1/5 text-gray-400" data-target="guide">
+                <i class="fa-solid fa-book-open text-xl"></i>
+                <span class="text-[10px] font-bold">導覽</span>
+            </button>
+            <button onclick="switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 w-1/5 text-gray-400" data-target="wallet">
+                <div class="bg-cat-orange text-white rounded-full w-12 h-12 flex items-center justify-center -mt-6 shadow-soft border-4 border-muji-bg">
+                    <i class="fa-solid fa-wallet text-lg"></i>
+                </div>
+                <span class="text-[10px] font-bold mt-1">記帳</span>
+            </button>
+            <button onclick="switchTab('lists')" class="nav-btn flex flex-col items-center gap-1 w-1/5 text-gray-400" data-target="lists">
+                <i class="fa-solid fa-list-check text-xl"></i>
+                <span class="text-[10px] font-bold">清單</span>
+            </button>
+            <button onclick="switchTab('info')" class="nav-btn flex flex-col items-center gap-1 w-1/5 text-gray-400" data-target="info">
+                <i class="fa-solid fa-circle-info text-xl"></i>
+                <span class="text-[10px] font-bold">資訊</span>
+            </button>
+        </div>
     </nav>
 
+    <div id="img-modal" class="fixed inset-0 bg-black/90 z-[60] hidden flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
+        <img id="img-modal-content" src="" class="max-w-full max-h-[80vh] rounded shadow-2xl">
+    </div>
+
     <script>
-        // ========================= DATA CONFIG (在此修改行程資料) =========================
-        
-        // 行程資料 (可以根據您的需求修改文字、時間、顏色)
-        // type: 'move' (交通), 'food' (餐廳), 'spot' (景點), 'hotel' (住宿)
-        // highlight: true (會用重點色標示)
-        const itineraryData = {
-            "D1": [
-                { time: "06:30", title: "桃園機場集合", desc: "第二航廈 長榮櫃台", type: "move", highlight: true },
-                { time: "08:50", title: "起飛 BR198", desc: "飛往東京成田", type: "move" },
-                { time: "14:30", title: "抵達市區 & Check-in", desc: "搭乘 Skyliner 直達上野", type: "hotel" },
-                { time: "16:00", title: "阿美橫丁逛街", desc: "藥妝採買、二木菓子", type: "spot" },
-                { time: "19:00", title: "晚餐：一蘭拉麵", desc: "上野山下口店", type: "food", link: "https://goo.gl/maps/xyz" }
+        // === 資料中心 ===
+        const APP_DATA = {
+            day1: [
+                { time: '03:30', title: '機場接送', desc: '家裡 -> 桃園機場', type: 'transport', icon: 'fa-car' },
+                { time: '07:35', title: '飛往名古屋 (CI 0154)', desc: 'TPE T1 -> NGO T1', type: 'transport', icon: 'fa-plane-departure', highlight: true },
+                { time: '11:05', title: '抵達名古屋中部機場', desc: '入境、拿行李', type: 'normal', icon: 'fa-person-arrival' },
+                { time: '12:00', title: '取車 (租車中心)', address: '1-1 Centrair, Tokoname, Aichi 479-0881', desc: '檢查車況、導航設定', type: 'key', icon: 'fa-key' },
+                { time: '13:30', title: 'JR Gate Tower Mall', address: '1-1-4 Meieki, Nakamura-ku, Nagoya', desc: '中餐 & 逛 Bic Camera', type: 'food', icon: 'fa-utensils' },
+                { time: '16:00', title: '前往鈴鹿', desc: '車程約 1 小時', type: 'transport', icon: 'fa-road' },
+                { time: '17:30', title: '入住：鈴鹿賽車樂園酒店', address: '7992 Inoucho, Suzuka, Mie 510-0201', desc: 'Check-in 休息', type: 'stay', icon: 'fa-bed', highlight: true }
             ],
-            "D2": [
-                { time: "09:00", title: "淺草寺參拜", desc: "雷門拍照、抽籤", type: "spot" },
-                { time: "12:00", title: "晴空塔", desc: "敘敘苑燒肉午餐 (已預約)", type: "food", highlight: true },
-                { time: "15:00", title: "澀谷 Sky", desc: "絕美日落展望台", type: "spot" }
-            ],
-            "D3": [
-                { time: "08:00", title: "迪士尼樂園", desc: "全日遊玩，記得抽 DPA", type: "spot", highlight: true, link: "https://www.tokyodisneyresort.jp/tc/tdl/" }
-            ],
-            "D4": [
-                { time: "10:00", title: "築地市場", desc: "吃玉子燒、生魚片", type: "food" },
-                { time: "14:00", title: "銀座逛街", desc: "步行者天國 (週末限定)", type: "spot" }
-            ],
-            "D5": [
-                { time: "10:00", title: "明治神宮", desc: "散步吸芬多精", type: "spot" },
-                { time: "13:00", title: "原宿竹下通", desc: "吃可麗餅", type: "food" }
-            ],
-            "D6": [
-                { time: "11:00", title: "退房 & 前往機場", desc: "最後補貨", type: "move" },
-                { time: "14:15", title: "回程 BR197", desc: "平安回家", type: "move", highlight: true }
+            checklist: [
+                "護照 (有效期6個月以上)", "Visit Japan Web QR Code", "網卡 / Roaming 開通", "駕照日文譯本", "行動電源", "個人藥品", "日幣現金"
             ]
         };
 
-        const checklistData = {
-            docs: ["護照 (有效期限6個月以上)", "Visit Japan Web截圖", "網卡/漫遊開通", "信用卡 (建議2-3張)", "日幣現金"],
-            items: ["行動電源", "充電線/轉接頭", "常備藥品 (胃藥/止痛)", "個人盥洗用品", "環保袋 (購物用)"]
-        };
-
-        // ========================= APP LOGIC =========================
-
-        // 1. View Switching
-        function switchView(viewName) {
-            // Hide all sections
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            // Show target
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+        // === 初始化 ===
+        document.addEventListener('DOMContentLoaded', () => {
+            renderItinerary();
+            renderChecklist();
+            renderMemos();
+            renderExpenses();
             
-            // Update Nav Icons
+            // 處理照片上傳預覽與壓縮
+            document.getElementById('expense-photo').addEventListener('change', handlePhotoUpload);
+        });
+
+        // === 1. 導航切換邏輯 ===
+        function switchTab(targetId) {
+            // 隱藏所有 Section
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById('view-' + targetId).classList.remove('hidden');
+            
+            // 更新按鈕狀態
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.target === viewName) {
-                    btn.classList.add('nav-active');
-                    btn.classList.remove('nav-inactive');
-                } else {
-                    btn.classList.remove('nav-active');
-                    btn.classList.add('nav-inactive');
+                btn.classList.remove('nav-active', 'text-cat-orange');
+                btn.classList.add('text-gray-400');
+                if(btn.dataset.target === targetId) {
+                    btn.classList.add('nav-active', 'text-cat-orange');
+                    btn.classList.remove('text-gray-400');
                 }
             });
 
-            // Special triggers
-            if(viewName === 'wallet') renderExpenses();
-            if(viewName === 'lists') renderMemoLinks();
+            window.scrollTo(0,0);
         }
 
-        // 2. Plan / Itinerary Logic
-        let currentDay = "D1";
+        // === 2. 行程表邏輯 (含 Google Map 連結) ===
+        function getGoogleMapLink(address) {
+            return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
+        }
 
-        function renderPlan() {
-            // Render Day Tabs
-            const tabsContainer = document.getElementById('day-tabs');
-            tabsContainer.innerHTML = Object.keys(itineraryData).map(day => `
-                <button onclick="setDay('${day}')" 
-                    class="px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition ${currentDay === day ? 'bg-primary text-white shadow-md' : 'bg-white text-gray-500 border border-gray-100'}">
-                    ${day}
-                </button>
-            `).join('');
+        function renderItinerary() {
+            const container = document.getElementById('itinerary-list');
+            let html = '';
 
-            // Render Timeline
-            const listContainer = document.getElementById('itinerary-list');
-            const items = itineraryData[currentDay] || [];
-            
-            listContainer.innerHTML = items.map((item, index) => {
-                const isLast = index === items.length - 1;
-                const iconMap = {
-                    move: 'fa-van-shuttle',
-                    food: 'fa-utensils',
-                    spot: 'fa-camera',
-                    hotel: 'fa-bed'
-                };
-                const icon = iconMap[item.type] || 'fa-circle';
+            APP_DATA.day1.forEach(item => {
+                const isHighlight = item.highlight ? 'bg-cat-light border-l-4 border-cat-orange' : 'bg-white border-l-4 border-gray-200';
+                const timeColor = item.highlight ? 'text-cat-orange font-bold' : 'text-gray-500 font-medium';
                 
-                return `
-                <div class="flex gap-4">
-                    <div class="flex flex-col items-center w-12 shrink-0">
-                        <div class="text-xs font-bold text-gray-400 mb-1">${item.time}</div>
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center z-10 ${item.highlight ? 'bg-primary text-white shadow-lg shadow-orange-200' : 'bg-white border-2 border-gray-200 text-gray-400'}">
-                            <i class="fa-solid ${icon} text-xs"></i>
+                // 地址按鈕
+                let mapBtn = '';
+                if (item.address) {
+                    mapBtn = `
+                        <a href="${getGoogleMapLink(item.address)}" target="_blank" class="mt-2 inline-flex items-center gap-1 bg-gray-100 hover:bg-cat-orange hover:text-white text-gray-600 px-3 py-1 rounded-full text-xs transition">
+                            <i class="fa-solid fa-location-arrow"></i> 導航
+                        </a>
+                    `;
+                }
+
+                html += `
+                    <div class="relative pl-6 pb-2 last:pb-0">
+                        <div class="absolute left-[7px] top-2 bottom-0 w-[2px] bg-gray-200"></div>
+                        <div class="absolute left-0 top-2 w-4 h-4 rounded-full border-2 border-white ${item.highlight ? 'bg-cat-orange' : 'bg-gray-300'} z-10"></div>
+                        
+                        <div class="card ${isHighlight} rounded-xl p-4 shadow-card mb-2 ml-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="${timeColor} text-sm mb-1">${item.time}</div>
+                                    <h4 class="font-bold text-gray-800 text-base">${item.title}</h4>
+                                    <p class="text-xs text-gray-500 mt-1">${item.desc}</p>
+                                    ${mapBtn}
+                                </div>
+                                <div class="text-gray-300 text-xl opacity-50">
+                                    <i class="fa-solid ${item.icon}"></i>
+                                </div>
+                            </div>
                         </div>
-                        ${!isLast ? '<div class="w-0.5 flex-1 bg-gray-200 my-1"></div>' : ''}
                     </div>
-                    <div class="flex-1 pb-6">
-                        <div class="bg-paper rounded-lg p-3 shadow-sm ${item.highlight ? 'border-l-4 border-primary' : ''}">
-                            <div class="font-bold text-gray-800 text-base">${item.title}</div>
-                            <div class="text-sm text-gray-500 mt-1">${item.desc}</div>
-                            ${item.link ? `<a href="${item.link}" target="_blank" class="inline-block mt-2 text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded hover:bg-blue-100"><i class="fa-solid fa-link mr-1"></i>查看詳情</a>` : ''}
-                        </div>
-                    </div>
-                </div>
                 `;
-            }).join('');
+            });
+            container.innerHTML = html;
         }
 
-        function setDay(day) {
-            currentDay = day;
-            renderPlan();
-        }
+        // === 3. 記帳與匯率邏輯 ===
+        let tempPhotoBase64 = null;
 
-        // 3. Wallet Logic
-        let expenses = JSON.parse(localStorage.getItem('travel_expenses')) || [];
-        let tempImgBase64 = null;
-
-        function renderExpenses() {
-            const list = document.getElementById('expense-list');
-            const rate = parseFloat(document.getElementById('exchange-rate').value);
-            let totalJPY = 0;
-
-            list.innerHTML = expenses.map((ex, idx) => {
-                totalJPY += ex.amount;
-                return `
-                <div class="bg-paper p-3 rounded-lg shadow-sm flex items-center justify-between">
-                    <div class="flex items-center gap-3 overflow-hidden">
-                        ${ex.img ? `<div onclick="showImage('${ex.img}')" class="w-10 h-10 rounded bg-cover bg-center shrink-0 cursor-pointer border border-gray-100" style="background-image:url('${ex.img}')"></div>` : `<div class="w-10 h-10 rounded bg-gray-100 flex items-center justify-center text-gray-400 shrink-0"><i class="fa-solid fa-receipt"></i></div>`}
-                        <div class="min-w-0">
-                            <div class="font-bold text-gray-800 truncate text-sm">${ex.name}</div>
-                            <div class="text-xs text-gray-400">${new Date(ex.date).toLocaleDateString()}</div>
-                        </div>
-                    </div>
-                    <div class="text-right shrink-0">
-                        <div class="font-bold text-gray-800">¥${ex.amount.toLocaleString()}</div>
-                        <div class="text-xs text-gray-400">≈ $${Math.round(ex.amount * rate).toLocaleString()}</div>
-                    </div>
-                    <button onclick="deleteExpense(${idx})" class="ml-2 text-gray-300 hover:text-red-400 px-2"><i class="fa-solid fa-trash"></i></button>
-                </div>
-                `;
-            }).join('');
+        function handlePhotoUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
             
-            if(expenses.length === 0) list.innerHTML = `<div class="text-center text-gray-400 mt-10 text-sm">還沒有記帳紀錄</div>`;
-
-            document.getElementById('total-expense').innerText = `總計: ¥${totalJPY.toLocaleString()} (約 NT$${Math.round(totalJPY*rate).toLocaleString()})`;
+            // 讀取檔案並壓縮
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // 設定壓縮後寬度
+                    const maxWidth = 400;
+                    const scaleSize = maxWidth / img.width;
+                    canvas.width = maxWidth;
+                    canvas.height = img.height * scaleSize;
+                    
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // 轉為 Base64
+                    tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    alert("📷 照片已準備好！");
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
         }
 
         function addExpense() {
-            const name = document.getElementById('expense-name').value;
-            const calcInput = document.getElementById('expense-calc').value;
+            const itemInput = document.getElementById('expense-item');
+            const amountInput = document.getElementById('expense-amount');
             
-            if(!name || !calcInput) return alert('請輸入名稱和金額');
+            if (!itemInput.value || !amountInput.value) {
+                alert("請輸入項目與金額");
+                return;
+            }
 
+            // 計算字串算式
+            let amount = 0;
             try {
-                // 安全的計算算式 (例如 500+200)
-                // 只允許數字和 + - * / . ()
-                if(/[^0-9+\-*/.()]/.test(calcInput)) throw new Error("無效字元");
-                const amount = new Function('return ' + calcInput)();
+                // 安全性注意：在單機簡易環境下使用 Function 建構子做運算
+                amount = new Function('return ' + amountInput.value)();
+            } catch (e) {
+                alert("金額格式錯誤，請輸入數字或算式");
+                return;
+            }
+
+            const expense = {
+                id: Date.now(),
+                item: itemInput.value,
+                amount: amount,
+                date: new Date().toLocaleString(),
+                photo: tempPhotoBase64
+            };
+
+            // 存入 LocalStorage
+            const expenses = JSON.parse(localStorage.getItem('myTripExpenses') || '[]');
+            expenses.unshift(expense);
+            localStorage.setItem('myTripExpenses', JSON.stringify(expenses));
+
+            // 清空輸入
+            itemInput.value = '';
+            amountInput.value = '';
+            tempPhotoBase64 = null;
+            document.getElementById('expense-photo').value = '';
+
+            renderExpenses();
+        }
+
+        function renderExpenses() {
+            const expenses = JSON.parse(localStorage.getItem('myTripExpenses') || '[]');
+            const list = document.getElementById('expense-list');
+            const rate = parseFloat(document.getElementById('exchange-rate').value) / 1000; // 0.215
+            
+            let totalJPY = 0;
+            
+            list.innerHTML = expenses.map(exp => {
+                totalJPY += exp.amount;
+                const twd = Math.round(exp.amount * rate);
                 
-                expenses.unshift({
-                    name,
-                    amount: Math.round(amount),
-                    date: new Date().toISOString(),
-                    img: tempImgBase64
-                });
-
-                localStorage.setItem('travel_expenses', JSON.stringify(expenses));
-                
-                // Reset form
-                document.getElementById('expense-name').value = '';
-                document.getElementById('expense-calc').value = '';
-                clearImage();
-                renderExpenses();
-
-            } catch(e) {
-                alert('金額格式錯誤，請輸入數字或簡單算式 (如 100+50)');
-            }
-        }
-
-        function deleteExpense(index) {
-            if(confirm('確定刪除此筆紀錄？')) {
-                expenses.splice(index, 1);
-                localStorage.setItem('travel_expenses', JSON.stringify(expenses));
-                renderExpenses();
-            }
-        }
-
-        function showImage(base64) {
-            const win = window.open("");
-            win.document.write(`<img src="${base64}" style="width:100%">`);
-        }
-
-        // Image Handling with Canvas Compression
-        function handleImagePreview(input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        // Canvas Compress
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        
-                        // Resize Logic (Max 600px)
-                        const MAX_SIZE = 600;
-                        let width = img.width;
-                        let height = img.height;
-                        
-                        if (width > height) {
-                            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
-                        } else {
-                            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
-                        }
-                        
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // Output Base64 (JPEG quality 0.7)
-                        tempImgBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                        
-                        // UI Update
-                        document.getElementById('img-preview').src = tempImgBase64;
-                        document.getElementById('img-preview-area').classList.remove('hidden');
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function clearImage() {
-            document.getElementById('img-preview-area').classList.add('hidden');
-            document.getElementById('expense-img').value = '';
-            tempImgBase64 = null;
-        }
-
-        // Live Calculator for Wallet Display
-        document.getElementById('expense-calc').addEventListener('keyup', function(e) {
-            try {
-                if(/[^0-9+\-*/.()]/.test(this.value)) return;
-                const val = new Function('return ' + this.value)();
-                const rate = parseFloat(document.getElementById('exchange-rate').value);
-                if(!isNaN(val)) {
-                    document.getElementById('display-jpy').innerText = '¥' + Math.round(val).toLocaleString();
-                    document.getElementById('display-twd').innerText = 'NT$' + Math.round(val * rate).toLocaleString();
-                }
-            } catch(e) {}
-        });
-
-        // 4. List Logic
-        function switchListTab(tab) {
-            if(tab === 'check') {
-                document.getElementById('list-check-content').classList.remove('hidden');
-                document.getElementById('list-memo-content').classList.add('hidden');
-                document.getElementById('btn-tab-check').className = "flex-1 py-1 text-sm rounded-md bg-white shadow text-primary font-bold transition";
-                document.getElementById('btn-tab-memo').className = "flex-1 py-1 text-sm rounded-md text-gray-500 font-medium transition";
-            } else {
-                document.getElementById('list-check-content').classList.add('hidden');
-                document.getElementById('list-memo-content').classList.remove('hidden');
-                document.getElementById('btn-tab-check').className = "flex-1 py-1 text-sm rounded-md text-gray-500 font-medium transition";
-                document.getElementById('btn-tab-memo').className = "flex-1 py-1 text-sm rounded-md bg-white shadow text-primary font-bold transition";
-            }
-        }
-
-        // Checklist Rendering & Persistence
-        let checkState = JSON.parse(localStorage.getItem('travel_checklist')) || {};
-
-        function renderChecklist() {
-            const renderGroup = (items, idPrefix) => items.map((item, idx) => {
-                const key = idPrefix + idx;
-                const isChecked = checkState[key];
                 return `
-                <li class="flex items-center group cursor-pointer" onclick="toggleCheck('${key}')">
-                    <div class="w-5 h-5 rounded border border-gray-300 mr-3 flex items-center justify-center transition ${isChecked ? 'bg-primary border-primary' : 'bg-white'}">
-                        ${isChecked ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
+                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            ${exp.photo ? 
+                                `<img src="${exp.photo}" onclick="document.getElementById('img-modal').classList.remove('hidden');document.getElementById('img-modal-content').src='${exp.photo}'" class="w-10 h-10 object-cover rounded bg-gray-200 cursor-pointer">` : 
+                                `<div class="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-gray-300"><i class="fa-solid fa-yen-sign"></i></div>`
+                            }
+                            <div>
+                                <div class="font-bold text-gray-700">${exp.item}</div>
+                                <div class="text-[10px] text-gray-400">${exp.date.split(',')[0]}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-lg text-cat-dark">¥${exp.amount}</div>
+                            <div class="text-xs text-gray-400">≈ $${twd}</div>
+                        </div>
                     </div>
-                    <span class="${isChecked ? 'text-gray-400 line-through' : 'text-gray-700'}">${item}</span>
-                </li>`;
+                `;
             }).join('');
 
-            document.getElementById('checklist-docs').innerHTML = renderGroup(checklistData.docs, 'd_');
-            document.getElementById('checklist-items').innerHTML = renderGroup(checklistData.items, 'i_');
+            // 更新總金額
+            document.getElementById('total-twd').innerText = Math.round(totalJPY * rate).toLocaleString();
         }
 
-        function toggleCheck(key) {
-            checkState[key] = !checkState[key];
-            localStorage.setItem('travel_checklist', JSON.stringify(checkState));
-            renderChecklist();
-        }
-
-        // Memo Logic
-        const memoPad = document.getElementById('memo-pad');
-        memoPad.value = localStorage.getItem('travel_memo') || '';
-        
-        memoPad.addEventListener('input', () => {
-            localStorage.setItem('travel_memo', memoPad.value);
-            renderMemoLinks();
-        });
-
-        function renderMemoLinks() {
-            const text = memoPad.value;
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            const matches = text.match(urlRegex);
-            
-            const container = document.getElementById('memo-links');
-            if(matches && matches.length > 0) {
-                container.innerHTML = matches.map(url => `
-                    <a href="${url}" target="_blank" class="block w-full bg-blue-50 text-blue-600 px-3 py-2 rounded text-sm truncate hover:bg-blue-100 mb-1">
-                        <i class="fa-solid fa-link mr-2"></i>${url}
-                    </a>
-                `).join('');
-            } else {
-                container.innerHTML = '';
+        function clearExpenses() {
+            if(confirm('確定要清除所有記帳紀錄嗎？此動作無法復原。')) {
+                localStorage.removeItem('myTripExpenses');
+                renderExpenses();
             }
         }
 
-        // Initialization
-        window.onload = function() {
-            // Load Exchange Rate
-            const savedRate = localStorage.getItem('travel_rate');
-            if(savedRate) document.getElementById('exchange-rate').value = savedRate;
-
-            renderPlan();
-            renderChecklist();
-            switchView('plan'); // Default View
-        };
-        
-        function saveSettings() {
-             localStorage.setItem('travel_rate', document.getElementById('exchange-rate').value);
+        // === 4. Checklist & Memo 邏輯 ===
+        function renderChecklist() {
+            const savedState = JSON.parse(localStorage.getItem('myTripChecklist') || '{}');
+            const container = document.getElementById('checklist-container');
+            
+            container.innerHTML = APP_DATA.checklist.map(item => {
+                const isChecked = savedState[item] ? 'checked' : '';
+                const textClass = savedState[item] ? 'line-through text-gray-400' : 'text-gray-700';
+                
+                return `
+                    <label class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100 shadow-sm cursor-pointer select-none transition hover:bg-gray-50">
+                        <input type="checkbox" class="w-5 h-5 accent-cat-orange rounded" ${isChecked} onchange="toggleCheck('${item}')">
+                        <span class="${textClass}">${item}</span>
+                    </label>
+                `;
+            }).join('');
         }
+
+        function toggleCheck(item) {
+            const savedState = JSON.parse(localStorage.getItem('myTripChecklist') || '{}');
+            savedState[item] = !savedState[item];
+            localStorage.setItem('myTripChecklist', JSON.stringify(savedState));
+            renderChecklist();
+        }
+
+        function addMemo() {
+            const input = document.getElementById('memo-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const memos = JSON.parse(localStorage.getItem('myTripMemos') || '[]');
+            memos.unshift({ id: Date.now(), text: text });
+            localStorage.setItem('myTripMemos', JSON.stringify(memos));
+            
+            input.value = '';
+            renderMemos();
+        }
+
+        function renderMemos() {
+            const memos = JSON.parse(localStorage.getItem('myTripMemos') || '[]');
+            const container = document.getElementById('memo-list');
+            
+            container.innerHTML = memos.map(memo => {
+                // 自動將網址轉換為連結
+                let content = memo.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-500 underline break-all"><i class="fa-solid fa-link"></i> Link</a>');
+                
+                return `
+                    <div class="flex justify-between items-start border-b border-gray-100 last:border-0 py-2">
+                        <div class="text-sm text-gray-600 break-words flex-1 pr-2">${content}</div>
+                        <button onclick="deleteMemo(${memo.id})" class="text-gray-300 hover:text-red-400 px-2"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteMemo(id) {
+            let memos = JSON.parse(localStorage.getItem('myTripMemos') || '[]');
+            memos = memos.filter(m => m.id !== id);
+            localStorage.setItem('myTripMemos', JSON.stringify(memos));
+            renderMemos();
+        }
+
+        // 匯率輸入框監聽
+        document.getElementById('exchange-rate').addEventListener('input', renderExpenses);
 
     </script>
 </body>
