@@ -106,6 +106,23 @@
             padding: 0 4px;
             border-radius: 2px;
             color: #c2410c;
+            font-weight: bold;
+        }
+        
+        /* 圖片輪播容器 */
+        .scroll-gallery {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 1rem;
+            padding-bottom: 1rem;
+        }
+        .scroll-item {
+            scroll-snap-align: center;
+            flex: 0 0 85%; /* 讓圖片稍微露出一點下一張 */
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid #eee;
         }
 
         /* 輸入框樣式 */
@@ -181,10 +198,10 @@
                 d1: [
                     { id: 'd1-1', time: '03:00', title: '機場接送', desc: '家裡 -> 桃園機場', type: 'transport', highlight: true },
                     { id: 'd1-2', time: '07:35', title: '起飛 CI 0154', desc: '飛往名古屋', type: 'flight' },
-                    { id: 'd1-3', time: '11:05', title: '抵達名古屋', desc: '中部國際機場', type: 'arrival' },
+                    { id: 'd1-3', time: '11:05', title: '抵達名古屋', desc: '中部國際機場\n(入境+領行李約1hr)', type: 'arrival' },
                     { id: 'd1-4', time: '12:00', title: '取車', desc: '停留：30分鐘\nCentrair, 1-chōme−1', type: 'car', addr: '〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一, 日本' },
-                    { id: 'd1-5', time: '13:00', title: 'JR Gate Tower Mall', desc: '停留：3小時\n★午餐 & 逛 Bic Camera\n★導航請用下方停車場地址', type: 'shop', addr: '1 Chome-26-34 Meiekiminami, Nakamura Ward, Nagoya, Aichi 450-0003日本' },
-                    { id: 'd1-6', time: '17:00', title: '住宿：鈴鹿賽道樂園酒店', desc: '★含早晚餐\n★含4張樂園護照 & 貴賓室卷', type: 'hotel', addr: '7992 Inoucho, Suzuka, Mie 510-0201日本' },
+                    { id: 'd1-5', time: '13:30', title: 'JR Gate Tower Mall', desc: '停留：3小時\n★午餐 & 逛 Bic Camera\n★導航請輸入電話: 052-586-7811', type: 'shop', addr: '1 Chome-26-34 Meiekiminami, Nakamura Ward, Nagoya, Aichi 450-0003日本' },
+                    { id: 'd1-6', time: '18:00', title: '住宿：鈴鹿賽道樂園酒店', desc: '★含早晚餐\n★含4張樂園護照 & 貴賓室卷', type: 'hotel', addr: '7992 Inoucho, Suzuka, Mie 510-0201日本' },
                     { id: 'd1-7', time: '19:30', title: '晚餐', desc: '飯店自助晚餐', type: 'food' }
                 ],
                 d2: [
@@ -192,7 +209,7 @@
                     { id: 'd2-2', time: '09:30', title: '鈴鹿賽車樂園', desc: '★記得拿中文地圖\n★掃QR看排隊時間', type: 'play', highlight: true },
                     { id: 'd2-3', time: '12:00', title: '午餐：GRAN VIEW', desc: '樂園內餐廳', type: 'food' },
                     { id: 'd2-4', time: '13:10', title: '賽道挑戰者', desc: '★停留：40分鐘\n★憑乘車卷x3 (Hotmail信件)', type: 'play', highlight: true },
-                    { id: 'd2-5', time: '17:00', title: '離開樂園', desc: '前往晚餐', type: 'transport' },
+                    { id: 'd2-5', time: '17:00', title: '離開樂園', desc: '前往晚餐 (車程約1hr)', type: 'transport' },
                     { id: 'd2-6', time: '18:00', title: '晚餐：萬來亭', desc: '停留：1小時\n名古屋市緑區作の山町', type: 'food', addr: '日本〒458-0038 Aichi, Nagoya, Midori Ward, Sakunoyamacho, 230 メゾン作の山 １' },
                     { id: 'd2-7', time: '19:30', title: '住宿：Airbnb', desc: '愛知縣名古屋市緑區', type: 'hotel', addr: '愛知縣名古屋市緑區鳴海町字作町26號' }
                 ]
@@ -343,63 +360,82 @@
 
         // --- 2. GUIDE MODULE ---
         function renderGuide(container) {
-            // GitHub image link handling (convert blob to raw)
-            const mapImgUrl = "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-1.png";
+            // Images array (Converted to raw for direct access)
+            const parkingImages = [
+                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-1.png",
+                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-2.png",
+                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-3.png",
+                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-4.png"
+            ];
 
             container.innerHTML = `
             <div class="p-6 space-y-8">
                 <div class="bg-white rounded-3xl overflow-hidden shadow-soft">
-                    <div class="h-48 bg-gray-100 relative overflow-hidden">
-                         <img src="${mapImgUrl}" class="w-full h-full object-cover" onclick="showFullImage('${mapImgUrl}')">
-                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                            <div>
-                                <span class="bg-cat-orange text-white text-[10px] font-bold px-2 py-1 rounded mb-1 inline-block">Shopping</span>
-                                <h2 class="text-2xl font-black text-white">JR Gate Tower Mall</h2>
-                            </div>
-                         </div>
+                    <div class="p-6 pb-2">
+                        <span class="guide-tag">Shopping Center</span>
+                        <h2 class="text-2xl font-black text-muji-text mt-2">JR Gate Tower Mall</h2>
+                        <div class="flex items-center gap-2 mt-2 text-gray-500 text-xs">
+                            <i class="fa-solid fa-location-dot text-cat-orange"></i>
+                            <span>JR 名古屋站直結</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 border-y border-gray-100 p-4">
+                         <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
+                            <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>停車場入口指引
+                        </h3>
+                        
+                        <div class="scroll-gallery no-scrollbar">
+                            ${parkingImages.map(img => `
+                                <div class="scroll-item shadow-sm">
+                                    <img src="${img}" class="w-full h-40 object-cover" onclick="showFullImage('${img}')">
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="text-center text-[10px] text-gray-400 mt-2"><i class="fa-solid fa-left-right mr-1"></i>左右滑動查看入口示意圖</div>
                     </div>
                     
-                    <div class="p-6">
-                        <div class="mb-6">
-                            <h3 class="font-bold text-lg text-muji-text mb-3 flex items-center">
-                                <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>停車場詳解
-                            </h3>
-                            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-sm text-gray-700 leading-relaxed">
-                                <p class="font-bold text-cat-orange mb-2">タワーズ一般駐車場 南口入口</p>
-                                <p class="mb-2">強烈建議直接在導航輸入電話：<br><span class="font-mono bg-white px-2 py-0.5 rounded text-black font-bold select-all">052-586-7811</span></p>
-                                <p>這是直達入口最保險的方式。點擊上方圖片可查看入口示意圖。</p>
+                    <div class="p-6 space-y-6">
+                        <div>
+                            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-sm leading-relaxed">
+                                <p class="font-bold text-cat-orange mb-1">タワーズ一般駐車場 南口入口</p>
+                                <p class="text-gray-600 mb-2 text-xs">建議直接在導航輸入下方電話，這是最保險的方式。</p>
+                                <a href="tel:0525867811" class="flex items-center justify-center bg-white border border-orange-200 text-cat-orange font-mono font-bold py-2 rounded-lg shadow-sm active:scale-95 transition-transform">
+                                    <i class="fa-solid fa-phone mr-2"></i> 052-586-7811
+                                </a>
                             </div>
                         </div>
 
-                        <hr class="border-dashed border-gray-200 my-4">
+                        <hr class="border-dashed border-gray-200">
 
                         <div>
                             <h3 class="font-bold text-lg text-muji-text mb-3 flex items-center">
                                 <i class="fa-solid fa-camera text-cat-orange mr-2"></i>Bic Camera 攻略
                             </h3>
-                            <p class="text-sm text-gray-600 mb-3">位於 JR Gate Tower 的 <span class="guide-highlight">9F 與 10F</span>。</p>
+                            <p class="text-sm text-gray-600 mb-3 pl-1">位於 JR Gate Tower 的 <span class="guide-highlight">9F 與 10F</span>。</p>
                             
-                            <div class="bg-gray-50 p-4 rounded-xl text-sm">
-                                <p class="font-bold text-gray-700 mb-2">🅿️ 停車折抵規則</p>
-                                <ul class="space-y-2 text-gray-600">
-                                    <li class="flex justify-between"><span>滿 5,000 円</span> <span class="font-bold">折抵 1小時</span></li>
-                                    <li class="flex justify-between"><span>滿 20,000 円</span> <span class="font-bold">折抵 2小時</span></li>
-                                    <li class="flex justify-between"><span>滿 50,000 円</span> <span class="font-bold">折抵 3小時</span></li>
+                            <div class="bg-white border border-gray-100 p-4 rounded-xl text-sm shadow-sm">
+                                <p class="font-bold text-gray-700 mb-3 border-b pb-2">🅿️ 停車折抵規則</p>
+                                <ul class="space-y-3 text-gray-600 text-xs">
+                                    <li class="flex justify-between items-center">
+                                        <span>消費滿 <span class="font-mono text-base">5,000</span> 円</span> 
+                                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-bold">折 1 hr</span>
+                                    </li>
+                                    <li class="flex justify-between items-center">
+                                        <span>消費滿 <span class="font-mono text-base">20,000</span> 円</span> 
+                                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-bold">折 2 hr</span>
+                                    </li>
+                                    <li class="flex justify-between items-center">
+                                        <span>消費滿 <span class="font-mono text-base">50,000</span> 円</span> 
+                                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded font-bold">折 3 hr</span>
+                                    </li>
                                 </ul>
-                                <p class="text-xs text-red-400 mt-2 text-center">* 結帳時請務必出示停車券 *</p>
+                                <div class="mt-3 flex items-start gap-2 text-xs text-red-500 bg-red-50 p-2 rounded">
+                                    <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
+                                    <span>請務必在結帳時出示停車券，離場前無法補登。</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-3xl overflow-hidden shadow-soft">
-                     <div class="p-6">
-                        <span class="guide-tag">Theme Park</span>
-                        <h2 class="text-xl font-black text-muji-text mb-3">鈴鹿賽車樂園筆記</h2>
-                        <p class="text-sm text-gray-600 leading-7 text-justify">
-                            <span class="font-bold text-cat-orange">Circuit Challenger</span> 是本次重點！
-                            這是一個可以行駛在真實 F1 賽道上的電動賽車體驗。請務必準時於預約時間前往。
-                        </p>
                     </div>
                 </div>
             </div>`;
