@@ -29,7 +29,7 @@
                         rounded: ['"Zen Maru Gothic"', 'sans-serif'],
                     },
                     boxShadow: {
-                        'soft': '0 4px 15px rgba(234, 88, 12, 0.08)',
+                        'soft': '0 4px 20px rgba(234, 88, 12, 0.08)',
                     }
                 }
             }
@@ -70,7 +70,29 @@
             z-index: 0;
         }
 
-        /* 貓咪導航按鈕特效 */
+        /* 行程選取特效 */
+        .itinerary-item {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .itinerary-item.selected {
+            border-color: #EA580C;
+            background-color: #FFF7ED; /* orange-50 */
+            transform: scale(1.02);
+        }
+        .paw-indicator {
+            display: none;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            color: #EA580C;
+            animation: bounce 1s infinite;
+        }
+        .itinerary-item.selected .paw-indicator {
+            display: block;
+        }
+
+        /* 底部導航動畫 */
         .nav-item.active { color: #EA580C; }
         .nav-item.active i { transform: scale(1.1); transition: transform 0.2s; }
         .nav-paw { display: none; }
@@ -150,14 +172,15 @@
             <div class="relative pl-2">
                 <div class="timeline-line"></div>
 
-                <div id="itinerary-d1" class="itinerary-day relative z-0 space-y-6">
+                <div id="itinerary-d1" class="relative z-0 space-y-6">
                     
                     <div class="flex gap-4">
                         <div class="w-12 flex-shrink-0 flex flex-col items-center">
                             <div class="w-3 h-3 bg-neko-accent rounded-full border-2 border-white shadow"></div>
                             <span class="text-xs font-mono font-bold mt-1 text-neko-accent">03:30</span>
                         </div>
-                        <div class="bg-orange-50 p-4 rounded-xl shadow-soft flex-1 border border-orange-100">
+                        <div class="bg-orange-50 p-4 rounded-xl shadow-soft flex-1 border border-orange-100 itinerary-item cursor-pointer" onclick="toggleSelect(this)">
+                            <i class="fas fa-paw paw-indicator"></i>
                             <h3 class="font-bold text-neko-accent">機場接送出發</h3>
                             <p class="text-xs text-gray-500 mt-1">家裡 -> 桃園機場</p>
                         </div>
@@ -168,36 +191,39 @@
                             <div class="w-3 h-3 bg-gray-300 rounded-full border-2 border-white shadow"></div>
                             <span class="text-xs font-mono text-gray-400 mt-1">12:00</span>
                         </div>
-                        <div class="bg-neko-card p-4 rounded-xl shadow-soft flex-1">
+                        <div class="bg-neko-card p-4 rounded-xl shadow-soft flex-1 itinerary-item cursor-pointer" onclick="toggleSelect(this)">
+                            <i class="fas fa-paw paw-indicator"></i>
                             <div class="flex justify-between items-start mb-2">
                                 <h3 class="font-bold">Times Car Rental 取車</h3>
                                 <i class="fas fa-car-side text-gray-300"></i>
                             </div>
                             <p class="text-xs text-gray-500 mb-2">中部國際機場店</p>
-                            <div class="bg-gray-50 p-2 rounded text-[10px] text-gray-500 mb-3 font-mono">
-                                〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一
+                            <div class="bg-gray-50 p-2 rounded text-[10px] text-gray-500 mb-3 font-mono break-all">
+                                〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1
                             </div>
-                            <div class="flex gap-2">
-                                <a href="https://www.google.com/maps/dir/?api=1&destination=34.8617,136.8117" target="_blank" class="flex-1 text-center text-xs bg-neko-accent text-white py-2 rounded-lg shadow active:scale-95 transition">
-                                    <i class="fas fa-location-arrow mr-1"></i> 導航前往
-                                </a>
-                            </div>
+                            <a href="https://www.google.com/maps/search/?api=1&query=〒479-0881+Aichi,+Tokoname,+Centrair,+1-chōme−1+1" target="_blank" class="block w-full text-center text-xs bg-neko-accent text-white py-2.5 rounded-lg shadow active:scale-95 transition">
+                                <i class="fas fa-location-arrow mr-1"></i> 導航前往
+                            </a>
                         </div>
                     </div>
 
                     <div class="flex gap-4">
                         <div class="w-12 flex-shrink-0 flex flex-col items-center">
                             <div class="w-3 h-3 bg-gray-300 rounded-full border-2 border-white shadow"></div>
-                            <span class="text-xs font-mono text-gray-600 mt-1 font-bold">13:00</span>
+                            <span class="text-xs font-mono text-gray-600 mt-1 font-bold">13:30</span>
                         </div>
-                        <div class="bg-neko-card p-4 rounded-xl shadow-soft flex-1">
+                        <div class="bg-neko-card p-4 rounded-xl shadow-soft flex-1 itinerary-item cursor-pointer" onclick="toggleSelect(this)">
+                            <i class="fas fa-paw paw-indicator"></i>
                             <h3 class="font-bold">JR Gate Tower Mall</h3>
-                            <p class="text-xs text-gray-500 mt-1 mb-1">中餐 & Bic Camera 購物 (預計3小時)</p>
+                            <p class="text-xs text-gray-500 mt-1 mb-1">中餐 & Bic Camera 購物 (停留約3hr)</p>
                             <div class="flex flex-wrap gap-1 mb-2">
                                 <span class="text-[10px] bg-orange-50 text-orange-400 px-2 py-0.5 rounded">Bic Camera 9F</span>
-                                <span class="text-[10px] bg-orange-50 text-orange-400 px-2 py-0.5 rounded">Uniqlo/GU 11F</span>
+                                <span class="text-[10px] bg-orange-50 text-orange-400 px-2 py-0.5 rounded">Uniqlo 11F</span>
                             </div>
-                            <a href="https://www.google.com/maps/dir/?api=1&destination=JR+Gate+Tower+Nagoya" target="_blank" class="block w-full text-center text-xs bg-white border border-gray-200 text-gray-600 py-2 rounded-lg hover:bg-gray-50">
+                            <div class="bg-gray-50 p-2 rounded text-[10px] text-gray-500 mb-3 font-mono break-all">
+                                1-1-4 Meieki, Nakamura-ku, Nagoya-shi
+                            </div>
+                            <a href="https://www.google.com/maps/search/?api=1&query=JR+Gate+Tower+Nagoya" target="_blank" class="block w-full text-center text-xs bg-white border border-gray-200 text-gray-600 py-2 rounded-lg hover:bg-gray-50">
                                 <i class="fas fa-map-marker-alt mr-1"></i> Google Map
                             </a>
                         </div>
@@ -206,9 +232,10 @@
                     <div class="flex gap-4">
                         <div class="w-12 flex-shrink-0 flex flex-col items-center">
                             <div class="w-3 h-3 bg-gray-800 rounded-full border-2 border-white shadow"></div>
-                            <span class="text-xs font-mono text-gray-600 mt-1 font-bold">17:30</span>
+                            <span class="text-xs font-mono text-gray-600 mt-1 font-bold">17:40</span>
                         </div>
-                        <div class="bg-neko-card p-4 rounded-xl shadow-soft flex-1 border-l-4 border-gray-800">
+                        <div class="bg-neko-card p-4 rounded-xl shadow-soft flex-1 border-l-4 border-gray-800 itinerary-item cursor-pointer" onclick="toggleSelect(this)">
+                            <i class="fas fa-paw paw-indicator"></i>
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h3 class="font-bold">鈴鹿賽車樂園酒店</h3>
@@ -217,6 +244,7 @@
                                 <i class="fas fa-bed text-gray-400"></i>
                             </div>
                             <p class="text-xs text-gray-500 mt-1 mb-2">Suzuka Circuit Hotel</p>
+                            <p class="text-[10px] text-gray-400 mb-2 font-mono">〒510-0201 Mie, Suzuka, Inoucho, 7992</p>
                             
                             <div class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden mb-2 relative">
                                 <iframe width="100%" height="100%" frameborder="0" style="border:0"
@@ -225,8 +253,8 @@
                                 <div class="absolute inset-0 pointer-events-none shadow-inner"></div>
                             </div>
                             
-                            <a href="https://www.google.com/maps/dir/?api=1&destination=Suzuka+Circuit+Hotel" target="_blank" class="block w-full text-center text-xs bg-gray-800 text-white py-2 rounded-lg shadow hover:bg-gray-700 transition">
-                                <i class="fas fa-route mr-1"></i> 規劃路線 (約 70分)
+                            <a href="https://www.google.com/maps/search/?api=1&query=Suzuka+Circuit+Hotel" target="_blank" class="block w-full text-center text-xs bg-gray-800 text-white py-2 rounded-lg shadow hover:bg-gray-700 transition">
+                                <i class="fas fa-route mr-1"></i> 導航前往 (約 70分)
                             </a>
                         </div>
                     </div>
@@ -441,6 +469,17 @@
             document.getElementById('main-container').scrollTop = 0;
         }
 
+        // --- Itinerary Selection Logic ---
+        function toggleSelect(element) {
+            // Remove 'selected' from all other siblings
+            const allItems = document.querySelectorAll('.itinerary-item');
+            allItems.forEach(el => {
+                if(el !== element) el.classList.remove('selected');
+            });
+            // Toggle clicked
+            element.classList.toggle('selected');
+        }
+
         // --- Wallet Logic ---
         let expenses = JSON.parse(localStorage.getItem('neko_expenses')) || [];
         let rate = parseFloat(localStorage.getItem('neko_rate')) || 0.215;
@@ -470,6 +509,7 @@
                 }
                 // Allow simple math: 500+200
                 if (/^[0-9+\-*/().\s]*$/.test(val)) {
+                    // Safe evaluation for simple math
                     const totalJpy = Function('"use strict";return (' + val + ')')();
                     twdDisplay.innerText = Math.round(totalJpy * rate).toLocaleString();
                     return totalJpy;
