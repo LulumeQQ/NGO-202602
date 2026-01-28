@@ -3,33 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neko Trip 2026</title>
+    <title>名古屋・貓之旅 2026</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'neko-bg': '#FDFBF7',      /* 米白紙張感 */
-                        'neko-card': '#FFFFFF',    /* 純白 */
-                        'neko-text': '#4A4A4A',    /* 鉛筆灰 */
-                        'neko-accent': '#EA580C',  /* 深橘貓色 */
-                        'neko-soft': '#FDBA74',    /* 淺橘 */
-                        'neko-line': '#E5E5E5'     /* 分隔線 */
+                        muji: {
+                            bg: '#FAF9F6', // 米白色
+                            text: '#3E3A39', // 深灰
+                            accent: '#E65100', // 深橘
+                            card: '#FFFFFF',
+                            line: '#D1D1D1'
+                        }
                     },
                     fontFamily: {
                         sans: ['"Noto Sans TC"', 'sans-serif'],
-                        rounded: ['"Zen Maru Gothic"', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'soft': '0 4px 20px rgba(234, 88, 12, 0.08)',
+                        round: ['"Zen Maru Gothic"', 'sans-serif'],
                     }
                 }
             }
@@ -38,628 +37,744 @@
 
     <style>
         body {
-            background-color: #FDFBF7;
-            color: #4A4A4A;
+            background-color: #FAF9F6;
+            color: #3E3A39;
             -webkit-tap-highlight-color: transparent;
         }
-        /* 隱藏 Scrollbar */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* 頁面切換動畫 */
-        .page-section {
+        /* 隱藏捲軸但保留功能 */
+        .hide-scrollbar::-webkit-scrollbar {
             display: none;
-            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding-bottom: 120px; /* 避開底部導航 */
         }
-        .page-section.active { display: block; }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* 貓掌選取效果 */
+        .paw-icon {
+            display: none;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 1.5rem;
+            color: #E65100;
+            background: white;
+            border-radius: 50%;
+            padding: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        .itinerary-card.selected {
+            border: 2px solid #E65100;
+            background-color: #FFF3E0;
+            transform: scale(1.02);
+        }
+
+        .itinerary-card.selected .paw-icon {
+            display: block;
+        }
         
-        .day-content {
+        .timeline-dot.selected {
+            background-color: #E65100;
+            border-color: white;
+            transform: scale(1.3);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        /* Tab 轉換動畫 */
+        .tab-content {
             display: none;
             animation: fadeIn 0.3s ease-in-out;
         }
-        .day-content.active { display: block; }
+        .tab-content.active {
+            display: block;
+        }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 時間軸線條 */
-        .timeline-line {
-            position: absolute;
-            left: 1.25rem;
-            top: 1rem;
-            bottom: 0;
-            width: 2px;
-            background: repeating-linear-gradient(to bottom, #E5E5E5 0, #E5E5E5 6px, transparent 6px, transparent 12px);
-            z-index: 0;
+        /* Loading */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #E65100;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
         }
-
-        /* --- 互動式行程樣式 --- */
-        .timeline-item {
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        
-        /* 預設狀態 */
-        .time-dot {
-            transition: all 0.3s ease;
-            background-color: #D1D5DB; /* gray-300 */
-        }
-        .time-text {
-            transition: color 0.3s ease;
-            color: #9CA3AF; /* gray-400 */
-        }
-        .card-box {
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-        .paw-indicator {
-            display: none;
-            position: absolute;
-            right: 12px;
-            top: 12px;
-            color: #EA580C;
-            animation: bounce 1s infinite;
-            z-index: 10;
-        }
-
-        /* ACTIVE 狀態 (點擊後) */
-        .timeline-item.active .time-dot {
-            background-color: #EA580C;
-            box-shadow: 0 0 0 3px #FFEDD5; /* orange-100 ring */
-            transform: scale(1.2);
-        }
-        .timeline-item.active .time-text {
-            color: #EA580C;
-            font-weight: 700;
-        }
-        .timeline-item.active .card-box {
-            border-color: #EA580C;
-            background-color: #FFF7ED; /* orange-50 */
-            transform: scale(1.01);
-            box-shadow: 0 10px 25px -5px rgba(234, 88, 12, 0.15);
-        }
-        .timeline-item.active .paw-indicator {
-            display: block;
-        }
-
-        /* Day 切換按鈕樣式 */
-        .day-btn.active {
-            background-color: #EA580C;
-            color: white;
-            border-color: #EA580C;
-        }
-
-        /* 底部導航動畫 */
-        .nav-item.active { color: #EA580C; }
-        .nav-item.active i { transform: scale(1.1); transition: transform 0.2s; }
-        .nav-paw { display: none; }
-        .nav-item.active .nav-paw { display: block; position: absolute; top: -8px; font-size: 10px; color: #EA580C; animation: bounce 1s infinite; }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="font-sans antialiased h-screen flex flex-col overflow-hidden text-neko-text">
+<body class="pb-24 font-sans antialiased">
 
-    <header class="bg-neko-bg/95 backdrop-blur-sm px-5 py-4 flex justify-between items-center z-20 sticky top-0 border-b border-neko-line">
-        <div class="flex items-center gap-3">
-            <div class="bg-neko-accent text-white w-9 h-9 rounded-full flex items-center justify-center shadow-soft transform -rotate-6">
-                <i class="fas fa-cat text-lg"></i>
+    <header class="fixed top-0 w-full z-40 bg-muji-bg/95 backdrop-blur-sm shadow-sm border-b border-muji-line/30 transition-all duration-300" id="main-header">
+        <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
+            <h1 class="text-xl font-bold font-round text-muji-text tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-cat text-muji-accent"></i>
+                <span>名古屋・貓之旅</span>
+            </h1>
+            <div class="text-xs text-muji-accent font-bold border border-muji-accent px-2 py-1 rounded-full">
+                2026.02
             </div>
-            <div>
-                <h1 class="text-lg font-rounded font-bold text-neko-text tracking-wide">Neko Trip</h1>
-                <p class="text-[10px] text-gray-400 font-mono tracking-widest">2026.02.06 - 02.14</p>
-            </div>
-        </div>
-        <div class="text-right">
-            <span class="text-neko-accent text-sm font-bold bg-orange-100 px-2 py-1 rounded-lg">名古屋</span>
         </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto no-scrollbar p-4 relative" id="main-container">
-        
-        <section id="plan" class="page-section active">
-            
-            <div class="bg-neko-card rounded-2xl p-5 shadow-soft mb-6 relative overflow-hidden border border-orange-100">
-                <div class="absolute -top-4 -right-4 w-20 h-20 bg-neko-accent/10 rounded-full"></div>
-                <h2 class="text-sm font-bold text-neko-accent mb-3 flex items-center relative z-10">
-                    <i class="fas fa-plane-departure mr-2"></i> 航班資訊
-                </h2>
+    <main class="max-w-md mx-auto px-4 pt-20">
+
+        <section id="plan" class="tab-content active">
+            <div class="bg-white rounded-xl p-4 shadow-sm mb-6 border-l-4 border-muji-accent">
+                <h3 class="font-bold text-lg mb-3 font-round flex items-center gap-2">
+                    <i class="fa-solid fa-plane-departure text-muji-accent"></i> 航班資訊
+                </h3>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between items-center border-b pb-2 border-dashed">
+                        <div>
+                            <span class="block text-gray-500 text-xs">2/06 去程 (CI 0154)</span>
+                            <span class="font-bold text-lg">07:35</span> TPE
+                        </div>
+                        <i class="fa-solid fa-arrow-right text-gray-300"></i>
+                        <div class="text-right">
+                            <span class="block text-gray-500 text-xs">11:05 抵達</span>
+                            <span class="font-bold text-lg">NGO</span> 名古屋
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="block text-gray-500 text-xs">2/14 回程 (CI 0151)</span>
+                            <span class="font-bold text-lg">09:50</span> NGO
+                        </div>
+                        <i class="fa-solid fa-arrow-right text-gray-300"></i>
+                        <div class="text-right">
+                            <span class="block text-gray-500 text-xs">12:15 抵達</span>
+                            <span class="font-bold text-lg">TPE</span> 台北
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8 relative">
+                <div class="absolute left-[19px] top-8 bottom-0 w-[2px] bg-gray-200"></div>
+                <h2 class="font-round text-2xl font-bold mb-4 text-muji-text sticky top-16 bg-muji-bg z-30 py-2">Day 1 <span class="text-sm font-normal text-gray-500">2/06 (五)</span></h2>
+
+                <div id="d1-container">
+                    </div>
+            </div>
+
+            <div class="mb-8 relative">
+                <div class="absolute left-[19px] top-8 bottom-0 w-[2px] bg-gray-200"></div>
+                <h2 class="font-round text-2xl font-bold mb-4 text-muji-text sticky top-16 bg-muji-bg z-30 py-2">Day 2 <span class="text-sm font-normal text-gray-500">2/07 (六)</span></h2>
                 
-                <div class="flex justify-between items-center mb-4 border-b border-dashed border-gray-200 pb-3">
-                    <div class="text-center w-1/3">
-                        <div class="text-2xl font-mono font-bold">TPE</div>
-                        <div class="text-xs text-gray-400">07:35</div>
+                <div id="d2-container">
                     </div>
-                    <div class="w-1/3 text-center flex flex-col items-center">
-                        <span class="text-[10px] text-neko-accent bg-orange-50 px-2 rounded-full mb-1">2/6 去程</span>
-                        <i class="fas fa-plane text-gray-300 transform rotate-45"></i>
-                        <span class="text-[10px] text-gray-400">CI 0154</span>
-                    </div>
-                    <div class="text-center w-1/3">
-                        <div class="text-2xl font-mono font-bold">NGO</div>
-                        <div class="text-xs text-gray-400">11:05</div>
-                    </div>
-                </div>
-
-                <div class="flex justify-between items-center">
-                    <div class="text-center w-1/3">
-                        <div class="text-2xl font-mono font-bold">NGO</div>
-                        <div class="text-xs text-gray-400">09:50</div>
-                    </div>
-                    <div class="w-1/3 text-center flex flex-col items-center">
-                        <span class="text-[10px] text-neko-accent bg-orange-50 px-2 rounded-full mb-1">2/14 回程</span>
-                        <i class="fas fa-plane text-gray-300 transform -rotate-45"></i>
-                        <span class="text-[10px] text-gray-400">CI 0151</span>
-                    </div>
-                    <div class="text-center w-1/3">
-                        <div class="text-2xl font-mono font-bold">TPE</div>
-                        <div class="text-xs text-gray-400">12:15</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex gap-2 mb-6 sticky top-0 z-10 bg-neko-bg py-2">
-                <button onclick="switchDay('d1')" class="day-btn active flex-1 py-2 rounded-xl border border-gray-200 text-sm font-bold text-gray-500 bg-white shadow-sm transition">D1 (2/6)</button>
-                <button onclick="switchDay('d2')" class="day-btn flex-1 py-2 rounded-xl border border-gray-200 text-sm font-bold text-gray-500 bg-white shadow-sm transition">D2 (2/7)</button>
-            </div>
-            
-            <div class="relative pl-2 pb-10">
-                <div class="timeline-line"></div>
-
-                <div id="day-d1" class="day-content active space-y-6 relative z-10">
-                    
-                    <div class="timeline-item flex gap-4" onclick="selectTimeline(this)">
-                        <div class="w-12 flex-shrink-0 flex flex-col items-center">
-                            <div class="time-dot w-3 h-3 rounded-full border-2 border-white shadow"></div>
-                            <span class="time-text text-xs font-mono mt-1">03:30</span>
-                        </div>
-                        <div class="card-box bg-neko-card p-4 rounded-xl shadow-soft flex-1 relative">
-                            <i class="fas fa-paw paw-indicator text-xl"></i>
-                            <h3 class="font-bold text-neko-accent">機場接送</h3>
-                            <p class="text-xs text-gray-500 mt-1">家裡 -> 桃園機場</p>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item flex gap-4" onclick="selectTimeline(this)">
-                        <div class="w-12 flex-shrink-0 flex flex-col items-center">
-                            <div class="time-dot w-3 h-3 rounded-full border-2 border-white shadow"></div>
-                            <span class="time-text text-xs font-mono mt-1">12:00</span>
-                        </div>
-                        <div class="card-box bg-neko-card p-4 rounded-xl shadow-soft flex-1 relative">
-                            <i class="fas fa-paw paw-indicator text-xl"></i>
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-bold">Times 取車</h3>
-                                <i class="fas fa-car-side text-gray-300"></i>
-                            </div>
-                            <div class="bg-gray-50 p-2 rounded text-[10px] text-gray-500 mb-3 font-mono break-all border border-gray-100">
-                                〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1
-                            </div>
-                            <a href="https://www.google.com/maps/search/?api=1&query=Aichi,Tokoname,Centrair,1-chome-1-1" target="_blank" class="block w-full text-center text-xs bg-neko-accent text-white py-2.5 rounded-lg shadow active:scale-95 transition">
-                                <i class="fas fa-location-arrow mr-1"></i> 導航前往
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item flex gap-4" onclick="selectTimeline(this)">
-                        <div class="w-12 flex-shrink-0 flex flex-col items-center">
-                            <div class="time-dot w-3 h-3 rounded-full border-2 border-white shadow"></div>
-                            <span class="time-text text-xs font-mono mt-1">13:30</span>
-                        </div>
-                        <div class="card-box bg-neko-card p-4 rounded-xl shadow-soft flex-1 relative">
-                            <i class="fas fa-paw paw-indicator text-xl"></i>
-                            <h3 class="font-bold">JR Gate Tower</h3>
-                            <p class="text-xs text-gray-500 mt-1 mb-1">中餐 & Bic Camera (預計3hr)</p>
-                            <div class="bg-gray-50 p-2 rounded text-[10px] text-gray-500 mb-3 font-mono break-all border border-gray-100">
-                                1-1-4 Meieki, Nakamura-ku, Nagoya-shi
-                            </div>
-                            <a href="https://www.google.com/maps/search/?api=1&query=JR+Gate+Tower+Nagoya" target="_blank" class="block w-full text-center text-xs bg-white border border-gray-200 text-gray-600 py-2 rounded-lg hover:bg-gray-50">
-                                <i class="fas fa-map-marker-alt mr-1"></i> Google Map
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item flex gap-4" onclick="selectTimeline(this)">
-                        <div class="w-12 flex-shrink-0 flex flex-col items-center">
-                            <div class="time-dot w-3 h-3 rounded-full border-2 border-white shadow"></div>
-                            <span class="time-text text-xs font-mono mt-1">17:40</span>
-                        </div>
-                        <div class="card-box bg-neko-card p-4 rounded-xl shadow-soft flex-1 relative border-l-4 border-gray-800">
-                            <i class="fas fa-paw paw-indicator text-xl"></i>
-                            <div class="flex justify-between items-start">
-                                <h3 class="font-bold">鈴鹿賽車樂園酒店</h3>
-                                <span class="text-[10px] text-white bg-gray-800 px-1.5 py-0.5 rounded">住</span>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1 mb-2">Suzuka Circuit Hotel</p>
-                            <a href="https://www.google.com/maps/search/?api=1&query=Suzuka+Circuit+Hotel" target="_blank" class="block w-full text-center text-xs bg-gray-800 text-white py-2 rounded-lg shadow hover:bg-gray-700 transition">
-                                <i class="fas fa-route mr-1"></i> 導航 (約70分)
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="day-d2" class="day-content space-y-6 relative z-10">
-                    
-                    <div class="timeline-item flex gap-4" onclick="selectTimeline(this)">
-                        <div class="w-12 flex-shrink-0 flex flex-col items-center">
-                            <div class="time-dot w-3 h-3 rounded-full border-2 border-white shadow"></div>
-                            <span class="time-text text-xs font-mono mt-1">09:30</span>
-                        </div>
-                        <div class="card-box bg-neko-card p-4 rounded-xl shadow-soft flex-1 relative">
-                            <i class="fas fa-paw paw-indicator text-xl"></i>
-                            <h3 class="font-bold text-neko-accent">鈴鹿賽車樂園</h3>
-                            <p class="text-xs text-gray-500 mt-1">全日遊玩，預計至 17:00</p>
-                            <div class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden my-2 relative border border-gray-200">
-                                <iframe width="100%" height="100%" frameborder="0" scrolling="no" src="https://www.openstreetmap.org/export/embed.html?bbox=136.525,34.840,136.545,34.855&layer=mapnik" style="pointer-events: none;"></iframe>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item flex gap-4" onclick="selectTimeline(this)">
-                        <div class="w-12 flex-shrink-0 flex flex-col items-center">
-                            <div class="time-dot w-3 h-3 rounded-full border-2 border-white shadow"></div>
-                            <span class="time-text text-xs font-mono mt-1">18:30</span>
-                        </div>
-                        <div class="card-box bg-neko-card p-4 rounded-xl shadow-soft flex-1 relative border-l-4 border-red-400">
-                            <i class="fas fa-paw paw-indicator text-xl"></i>
-                            <div class="flex justify-between items-start">
-                                <h3 class="font-bold">名古屋綠區 Airbnb</h3>
-                                <span class="text-[10px] text-white bg-red-400 px-1.5 py-0.5 rounded">住</span>
-                            </div>
-                            <div class="bg-gray-50 p-2 rounded text-[10px] text-gray-500 my-2 font-mono break-all border border-gray-100">
-                                愛知縣名古屋市緑區鳴海町字作町26號
-                            </div>
-                            <a href="https://www.google.com/maps/search/?api=1&query=愛知縣名古屋市緑區鳴海町字作町26號" target="_blank" class="block w-full text-center text-xs bg-red-400 text-white py-2 rounded-lg shadow hover:bg-red-500 transition">
-                                <i class="fas fa-home mr-1"></i> 導航前往
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </section>
 
-        <section id="guide" class="page-section">
-            <h2 class="text-2xl font-rounded font-bold mb-6 text-neko-text tracking-wide relative inline-block">
-                Discovery
-                <span class="absolute -bottom-1 left-0 w-full h-2 bg-orange-200 -z-10 opacity-50 rounded-full"></span>
-            </h2>
+        <section id="guide" class="tab-content">
+            <h2 class="font-round text-2xl font-bold mb-6">深度導覽</h2>
             
-            <article class="bg-neko-card rounded-2xl overflow-hidden shadow-soft mb-8 group">
-                <div class="h-40 bg-gray-800 relative overflow-hidden flex items-center justify-center">
-                    <i class="fas fa-flag-checkered text-6xl text-white opacity-20"></i>
-                    <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-gray-800 shadow">
-                        SUZUKA
+            <article class="bg-white rounded-xl overflow-hidden shadow-sm mb-6">
+                <div class="h-40 bg-gray-200 relative">
+                     <img src="https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Nagoya">
+                     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                         <h3 class="text-white font-bold text-xl font-round">名古屋車站迷宮</h3>
+                     </div>
+                </div>
+                <div class="p-5">
+                    <p class="text-sm text-gray-600 leading-relaxed mb-4">
+                        <span class="text-4xl float-left mr-2 font-serif text-muji-accent">名</span>
+                        古屋站（Nagoya Station）是金氏世界紀錄認證「全世界賣場面積最大的車站」。這裡不只是交通樞紐，更是購物天堂。JR Gate Tower 與中央塔樓相連，形成了巨大的垂直城市。
+                    </p>
+                    <div class="bg-orange-50 p-3 rounded-lg border border-orange-100 mb-4">
+                        <h4 class="font-bold text-muji-accent text-sm mb-1"><i class="fa-solid fa-lightbulb"></i> 冷知識</h4>
+                        <p class="text-xs text-gray-600">名古屋人俗稱這裡為「名駅 (Meieki)」，如果你看到路標寫 Meieki，指的就是這一區喔！此外，車站著名的地標「娜娜醬人偶 (Nana-chan)」身高 6.1 公尺，會隨季節換裝，記得去合照！</p>
                     </div>
                 </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold mb-3 font-rounded">鈴鹿賽道：速度的殿堂</h3>
-                    <p class="text-sm text-gray-600 leading-relaxed text-justify mb-4">
-                        鈴鹿賽道 (Suzuka Circuit) 是本田宗一郎為了測試 Honda 機車所打造，也是日本最古老的國際賽道。
+            </article>
+
+            <article class="bg-white rounded-xl overflow-hidden shadow-sm mb-6">
+                 <div class="h-40 bg-gray-200 relative">
+                     <img src="https://images.unsplash.com/photo-1579619626359-2c676997cb66?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Suzuka">
+                     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                         <h3 class="text-white font-bold text-xl font-round">鈴鹿賽車場</h3>
+                     </div>
+                </div>
+                <div class="p-5">
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        F1日本大獎賽的舉辦地。不同於一般遊樂園，這裡充滿了「本田魂 (Honda Spirit)」。MOTOPIA 樂園的設計理念是讓孩子們從小就能體驗「自己駕駛的樂趣」，許多設施都需要孩子親自操控油門與方向盤，而非被動乘坐。
                     </p>
-                    <div class="bg-orange-50 p-3 rounded-lg border-l-2 border-neko-accent mb-4">
-                        <p class="text-xs text-gray-600">
-                            <span class="font-bold text-neko-accent">冷知識：</span> 它是 F1 賽程中極少數呈現「8字形」立體交叉設計的賽道，對車手的技術要求極高！
-                        </p>
-                    </div>
                 </div>
             </article>
         </section>
 
-        <section id="wallet" class="page-section">
-            <div class="bg-gray-800 text-white rounded-2xl p-5 shadow-lg mb-6 sticky top-0 z-10 mx-1 border border-gray-700">
+        <section id="wallet" class="tab-content">
+            
+            <div class="bg-white p-4 rounded-xl shadow-sm mb-6 sticky top-20 z-20 border border-gray-100">
                 <div class="flex justify-between items-end mb-2">
-                    <label class="text-xs text-gray-400 flex items-center gap-1">
-                        匯率: 
-                        <input type="number" id="exchange-rate" value="0.215" step="0.001" class="bg-gray-700 rounded px-1 w-16 text-center text-white focus:outline-none focus:ring-1 focus:ring-neko-accent" onchange="updateRate()">
-                    </label>
-                    <span class="text-xs text-neko-accent font-bold">NTD</span>
+                    <label class="text-xs text-gray-500">匯率設定 (1 JPY = ? TWD)</label>
+                    <input type="number" id="exchange-rate" value="0.215" step="0.001" class="w-20 text-right border-b border-muji-accent focus:outline-none text-sm font-bold bg-transparent" onchange="updateTotal()">
                 </div>
-                <div class="text-right text-4xl font-mono font-bold mb-1 tracking-tight truncate" id="twd-display">0</div>
-                <div class="w-full h-px bg-gray-600 my-3"></div>
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-400 font-mono">JPY ¥</span>
-                    <input type="text" id="jpy-input" placeholder="例如: 500+200*3" class="bg-transparent text-right text-xl w-3/4 text-white placeholder-gray-600 focus:outline-none font-mono" inputmode="decimal">
+                
+                <div class="bg-gray-100 rounded-lg p-3 mb-3 text-right">
+                    <div id="calc-expression" class="text-xs text-gray-500 h-4"></div>
+                    <input type="text" id="calc-display" class="w-full bg-transparent text-2xl font-bold text-right focus:outline-none font-mono" placeholder="0" readonly>
+                    <div class="text-muji-accent text-sm mt-1 font-bold">
+                        ≈ NT$ <span id="calc-twd">0</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-4 gap-2">
+                    <button onclick="calcAppend('7')" class="p-3 bg-gray-50 rounded-lg font-bold active:bg-gray-200">7</button>
+                    <button onclick="calcAppend('8')" class="p-3 bg-gray-50 rounded-lg font-bold active:bg-gray-200">8</button>
+                    <button onclick="calcAppend('9')" class="p-3 bg-gray-50 rounded-lg font-bold active:bg-gray-200">9</button>
+                    <button onclick="calcAppend('/')" class="p-3 bg-orange-50 text-muji-accent rounded-lg font-bold active:bg-orange-100">÷</button>
+                    
+                    <button onclick="calcAppend('4')" class="p-3 bg-gray-50 rounded-lg font-bold active:bg-gray-200">4</button>
+                    <button onclick="calcAppend('5')" class="p-3 bg-gray-50 rounded-lg font-bold active:bg-gray-200">5</button>
+                    <button onclick="calcAppend('6')" class="p-3 bg-gray-50 rounded-lg font-bold active:bg-gray-200">6</button>
+                    <button onclick="calcAppend('*')" class="p-3 bg-orange-50 text-muji-accent rounded-lg font-bold active:bg-orange-100">×</button>
+                    
+                    <button onclick="calcAppend('1')" class="p-3 bg-gray-50 rounded-lg font-bold active:bg-gray-200">1</button>
+                    <button onclick="calcAppend('2')" class="p-3 bg-gray-50 rounded-lg font-bold active:bg-gray-200">2</button>
+                    <button onclick="calcAppend('3')" class="p-3 bg-gray-50 rounded-lg font-bold active:bg-gray-200">3</button>
+                    <button onclick="calcAppend('-')" class="p-3 bg-orange-50 text-muji-accent rounded-lg font-bold active:bg-orange-100">-</button>
+                    
+                    <button onclick="calcClear()" class="p-3 bg-red-50 text-red-500 rounded-lg font-bold active:bg-red-100">C</button>
+                    <button onclick="calcAppend('0')" class="p-3 bg-gray-50 rounded-lg font-bold active:bg-gray-200">0</button>
+                    <button onclick="calcEval()" class="p-3 bg-muji-accent text-white rounded-lg font-bold shadow-md active:bg-orange-800">=</button>
+                    <button onclick="calcAppend('+')" class="p-3 bg-orange-50 text-muji-accent rounded-lg font-bold active:bg-orange-100">+</button>
+                </div>
+                
+                <div class="mt-3 pt-3 border-t border-gray-100 flex gap-2">
+                    <input type="text" id="expense-item" placeholder="品項名稱" class="flex-1 bg-gray-50 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-muji-accent">
+                    
+                    <input type="file" id="expense-photo" accept="image/*" class="hidden" onchange="handlePhotoSelect(this)">
+                    <button onclick="document.getElementById('expense-photo').click()" class="w-10 flex items-center justify-center bg-gray-100 rounded-lg text-gray-500 relative">
+                        <i class="fa-solid fa-camera"></i>
+                        <span id="photo-indicator" class="hidden absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full"></span>
+                    </button>
+                    
+                    <button onclick="addExpense()" class="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-bold">記帳</button>
                 </div>
             </div>
 
-            <div class="bg-white p-4 rounded-2xl shadow-soft mb-6">
-                <div class="flex gap-2 mb-3">
-                    <input type="text" id="item-name" placeholder="品項名稱" class="flex-1 bg-gray-50 px-3 py-3 rounded-xl border-none focus:ring-2 focus:ring-neko-accent outline-none text-sm bg-gray-50">
-                    <label class="bg-orange-50 text-neko-accent w-12 flex items-center justify-center rounded-xl cursor-pointer active:bg-orange-100 transition border border-orange-100">
-                        <i class="fas fa-camera"></i>
-                        <input type="file" accept="image/*" id="photo-upload" class="hidden" onchange="handleImageUpload(this)">
-                    </label>
-                </div>
-                <div id="upload-preview" class="mb-3 hidden relative w-fit">
-                    <img id="preview-img" src="" class="h-16 rounded-lg border border-gray-200">
-                    <button onclick="clearImage()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow"><i class="fas fa-times"></i></button>
-                </div>
-                <button onclick="addExpense()" class="w-full bg-neko-accent text-white py-3 rounded-xl font-bold shadow-md active:transform active:scale-95 transition flex items-center justify-center gap-2">
-                    <i class="fas fa-plus-circle"></i> 記一筆
-                </button>
-            </div>
-
-            <div class="flex justify-between items-center mb-3 px-2">
-                <h3 class="font-bold text-lg font-rounded">消費紀錄</h3>
-                <span id="total-spent" class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-lg">總計: NT$ 0</span>
-            </div>
-            <div id="expense-list" class="space-y-3 pb-20"></div>
-            <div class="mt-8 text-center pb-8">
-                 <button onclick="clearExpenses()" class="text-xs text-red-300 border border-red-100 px-3 py-1 rounded-full hover:bg-red-50 hover:text-red-500 transition">重置紀錄</button>
+            <div class="space-y-3">
+                <h3 class="font-bold font-round text-lg">記帳列表 <span class="text-sm font-normal text-gray-500" id="total-expense"></span></h3>
+                <div id="expense-list" class="space-y-2 pb-10">
+                    </div>
+                <button onclick="clearExpenses()" class="w-full text-center text-xs text-gray-400 py-4 underline">清除所有記錄</button>
             </div>
         </section>
 
-        <section id="lists" class="page-section">
-            <div class="bg-neko-card rounded-2xl p-5 shadow-soft mb-6 relative">
-                <div class="absolute -left-1 top-4 w-1 h-8 bg-neko-accent rounded-r"></div>
-                <div class="flex justify-between items-center mb-4 pl-2">
-                    <h2 class="text-lg font-bold font-rounded">行前準備 CheckList</h2>
-                    <button onclick="resetChecklist()" class="text-xs text-gray-400 hover:text-neko-accent"><i class="fas fa-undo"></i></button>
-                </div>
-                <div id="checklist-container" class="space-y-3"></div>
-                <div class="mt-4 flex gap-2 border-t border-dashed border-gray-100 pt-3">
-                    <input type="text" id="new-todo" placeholder="新增待辦..." class="flex-1 text-sm bg-transparent outline-none">
-                    <button onclick="addTodo()" class="text-neko-accent"><i class="fas fa-plus"></i></button>
+        <section id="lists" class="tab-content">
+            <div class="bg-white rounded-xl shadow-sm p-5 mb-6">
+                <h3 class="font-round font-bold text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-check text-muji-accent"></i> 行前準備
+                </h3>
+                <div id="checklist-container" class="space-y-2">
+                    </div>
+                <div class="flex mt-4 gap-2">
+                    <input type="text" id="new-check-item" placeholder="新增項目..." class="flex-1 border-b border-gray-300 focus:outline-none focus:border-muji-accent text-sm py-1 bg-transparent">
+                    <button onclick="addCheckItem()" class="text-muji-accent"><i class="fa-solid fa-plus-circle text-xl"></i></button>
                 </div>
             </div>
 
-            <div class="bg-neko-card rounded-2xl p-5 shadow-soft relative">
-                <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-8 h-3 bg-neko-soft/30 rounded-sm"></div>
-                <h2 class="text-lg font-bold font-rounded mb-3">備忘錄</h2>
-                <textarea id="memo-area" class="w-full h-32 bg-yellow-50/50 p-3 rounded-lg border border-yellow-100 text-sm focus:outline-none focus:border-neko-soft resize-none leading-relaxed text-gray-600 placeholder-gray-300" placeholder="可輸入筆記或網址..."></textarea>
-                <div id="memo-links" class="mt-3 flex flex-wrap gap-2"></div>
+            <div class="bg-white rounded-xl shadow-sm p-5">
+                <h3 class="font-round font-bold text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-regular fa-note-sticky text-muji-accent"></i> 備忘錄
+                </h3>
+                <textarea id="memo-area" class="w-full h-40 p-3 bg-yellow-50 rounded-lg text-sm leading-relaxed focus:outline-none focus:ring-1 focus:ring-muji-accent resize-none placeholder-gray-400" placeholder="隨手記下筆記，輸入網址會自動變連結..." oninput="saveMemo()"></textarea>
+                <div id="memo-links" class="mt-3 flex flex-wrap gap-2">
+                    </div>
             </div>
         </section>
 
-        <section id="info" class="page-section">
-            <h2 class="text-xl font-rounded font-bold mb-4 px-2">實用資訊</h2>
+        <section id="info" class="tab-content">
+            <h2 class="font-round text-2xl font-bold mb-6">旅遊資訊</h2>
+
             <div class="grid grid-cols-2 gap-4 mb-6">
-                <a href="https://tenki.jp/forecast/5/26/5110/23100/" target="_blank" class="bg-blue-50 p-4 rounded-2xl text-center shadow-sm active:scale-95 transition border border-blue-100 flex flex-col items-center">
-                    <i class="fas fa-cloud-sun-rain text-3xl text-blue-400 mb-2"></i>
-                    <div class="font-bold text-gray-700">名古屋天氣</div>
+                <a href="https://www.jma.go.jp/bosai/forecast/" target="_blank" class="bg-blue-50 p-4 rounded-xl flex flex-col items-center justify-center gap-2 text-blue-600 hover:bg-blue-100 transition">
+                    <i class="fa-solid fa-cloud-sun text-3xl"></i>
+                    <span class="font-bold text-sm">日本氣象廳</span>
                 </a>
-                <a href="tel:110" class="bg-red-50 p-4 rounded-2xl text-center shadow-sm active:scale-95 transition border border-red-100 flex flex-col items-center">
-                    <i class="fas fa-phone-alt text-3xl text-red-400 mb-2"></i>
-                    <div class="font-bold text-gray-700">緊急 110/119</div>
+                <a href="https://www.google.com/maps/search/drugstore" target="_blank" class="bg-pink-50 p-4 rounded-xl flex flex-col items-center justify-center gap-2 text-pink-600 hover:bg-pink-100 transition">
+                    <i class="fa-solid fa-store text-3xl"></i>
+                    <span class="font-bold text-sm">附近藥妝店</span>
                 </a>
             </div>
-            <div class="bg-neko-card rounded-2xl p-5 shadow-soft mb-6 border-l-4 border-neko-accent">
-                <h3 class="font-bold mb-3 flex items-center"><i class="fas fa-exclamation-triangle text-neko-accent mr-2"></i>注意與禁忌</h3>
-                <ul class="text-sm text-gray-600 space-y-2">
-                    <li class="flex items-start"><span class="text-neko-accent mr-2 font-bold">·</span>右駕開車請靠左，轉彎「左小右大」。</li>
-                    <li class="flex items-start"><span class="text-neko-accent mr-2 font-bold">·</span>肉類製品禁止攜帶出入境。</li>
-                    <li class="flex items-start"><span class="text-neko-accent mr-2 font-bold">·</span>日本無小費文化。</li>
+
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+                <div class="bg-red-50 p-3 border-b border-red-100">
+                    <h3 class="text-red-600 font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-phone-volume"></i> 緊急聯絡
+                    </h3>
+                </div>
+                <div class="p-4 space-y-3 text-sm">
+                    <div class="flex justify-between items-center">
+                        <span>警察局</span>
+                        <a href="tel:110" class="font-mono font-bold bg-gray-100 px-3 py-1 rounded-full">110</a>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>火警/救護車</span>
+                        <a href="tel:119" class="font-mono font-bold bg-gray-100 px-3 py-1 rounded-full">119</a>
+                    </div>
+                    <div class="pt-2 border-t text-xs text-gray-500">
+                        <p class="mb-1">台北駐大阪經濟文化辦事處 (名古屋分處)</p>
+                        <p>電話：090-XXXX-XXXX (急難救助)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-5">
+                <h3 class="font-bold mb-3 font-round">⚠️ 注意事項</h3>
+                <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                    <li>日本電壓 100V，插頭為雙平腳（與台灣相同）。</li>
+                    <li>購物滿 5,500 日圓可退稅，需出示護照。</li>
+                    <li>電車內請將手機設為靜音，避免通話。</li>
+                    <li>禁止攜帶肉類製品回台灣。</li>
                 </ul>
-            </div>
-             <div class="bg-gray-800 rounded-2xl p-5 shadow-soft text-gray-200">
-                 <h3 class="font-bold mb-2 text-white">台北駐大阪經濟文化辦事處</h3>
-                 <p class="text-xs mb-1 opacity-70">地址：大阪市北區中之島2-3-18</p>
-                 <p class="text-xs opacity-70">緊急電話：(81-90) 8794-4568</p>
             </div>
         </section>
 
     </main>
 
-    <nav class="bg-white/95 backdrop-blur border-t border-gray-100 fixed bottom-0 w-full z-30 pb-safe shadow-[0_-5px_15px_rgba(0,0,0,0.02)]">
-        <div class="flex justify-around items-center h-16 pb-1">
-            <button onclick="switchTab('plan')" class="nav-item active flex flex-col items-center justify-center w-1/5 text-gray-300 transition-all duration-200 relative" data-target="plan">
-                <i class="fas fa-paw nav-paw"></i>
-                <i class="fas fa-calendar-alt text-xl mb-1"></i>
-                <span class="text-[10px] font-medium">行程</span>
+    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 pb-safe pt-1 z-50">
+        <div class="flex justify-around items-center h-16 max-w-md mx-auto">
+            <button onclick="switchTab('plan')" class="nav-btn active flex flex-col items-center gap-1 w-full text-gray-400 hover:text-muji-accent transition-colors">
+                <i class="fa-solid fa-map-location-dot text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">行程</span>
             </button>
-            <button onclick="switchTab('guide')" class="nav-item flex flex-col items-center justify-center w-1/5 text-gray-300 transition-all duration-200 relative" data-target="guide">
-                <i class="fas fa-paw nav-paw"></i>
-                <i class="fas fa-map-marked-alt text-xl mb-1"></i>
-                <span class="text-[10px] font-medium">導覽</span>
+            <button onclick="switchTab('guide')" class="nav-btn flex flex-col items-center gap-1 w-full text-gray-400 hover:text-muji-accent transition-colors">
+                <i class="fa-solid fa-book-open text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">導覽</span>
             </button>
-            <button onclick="switchTab('wallet')" class="nav-item flex flex-col items-center justify-center w-1/5 text-gray-300 transition-all duration-200 relative" data-target="wallet">
-                <div class="bg-neko-accent text-white rounded-2xl w-12 h-12 flex items-center justify-center shadow-lg shadow-orange-200 mb-1 transform -translate-y-4 border-4 border-white">
-                    <i class="fas fa-calculator text-lg"></i>
+            <button onclick="switchTab('wallet')" class="nav-btn flex flex-col items-center gap-1 w-full text-gray-400 hover:text-muji-accent transition-colors">
+                <div class="bg-muji-accent text-white rounded-full w-10 h-10 flex items-center justify-center -mt-6 shadow-lg border-4 border-muji-bg">
+                    <i class="fa-solid fa-yen-sign text-lg"></i>
                 </div>
+                <span class="text-[10px] font-bold mt-1">記帳</span>
             </button>
-            <button onclick="switchTab('lists')" class="nav-item flex flex-col items-center justify-center w-1/5 text-gray-300 transition-all duration-200 relative" data-target="lists">
-                <i class="fas fa-paw nav-paw"></i>
-                <i class="fas fa-tasks text-xl mb-1"></i>
-                <span class="text-[10px] font-medium">清單</span>
+            <button onclick="switchTab('lists')" class="nav-btn flex flex-col items-center gap-1 w-full text-gray-400 hover:text-muji-accent transition-colors">
+                <i class="fa-solid fa-list-check text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">清單</span>
             </button>
-            <button onclick="switchTab('info')" class="nav-item flex flex-col items-center justify-center w-1/5 text-gray-300 transition-all duration-200 relative" data-target="info">
-                <i class="fas fa-paw nav-paw"></i>
-                <i class="fas fa-info-circle text-xl mb-1"></i>
-                <span class="text-[10px] font-medium">資訊</span>
+            <button onclick="switchTab('info')" class="nav-btn flex flex-col items-center gap-1 w-full text-gray-400 hover:text-muji-accent transition-colors">
+                <i class="fa-solid fa-circle-info text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">資訊</span>
             </button>
         </div>
     </nav>
 
     <script>
-        // --- Init Data ---
-        const defaultChecklist = [
-            { text: "護照 (效期6個月以上)", checked: false },
-            { text: "台灣駕照 + 日文譯本", checked: false },
-            { text: "網卡 / eSIM", checked: false },
-            { text: "日幣現金 / 信用卡", checked: false },
-            { text: "Visit Japan Web", checked: false },
-            { text: "行動電源 & 充電線", checked: false }
+        // Data & State
+        const ITINERARY = {
+            d1: [
+                { time: "03:30", title: "機場接送", desc: "家裡 -> 桃園機場", type: "transport" },
+                { time: "07:35", title: "起飛 CI 0154", desc: "飛往名古屋", type: "flight", important: true },
+                { time: "11:05", title: "抵達名古屋", desc: "中部國際機場", type: "flight" },
+                { time: "12:00", title: "取車", desc: "〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一", type: "car", map: "〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一" },
+                { time: "13:30", title: "JR Gate Tower Mall", desc: "中餐與逛 Bic Camera", type: "food", map: "1-1-4 Meieki, Nakamura-ku, Nagoya-shi, Aichi 450-6001" },
+                { time: "16:00", title: "前往鈴鹿", desc: "開車移動", type: "transport" },
+                { time: "18:00", title: "住宿：鈴鹿賽車樂園酒店", desc: "7992 Inoucho, Suzuka, Mie 510-0201", type: "hotel", map: "7992 Inoucho, Suzuka, Mie 510-0201" }
+            ],
+            d2: [
+                { time: "09:00", title: "鈴鹿賽車樂園", desc: "玩到 17:00", type: "play", important: true, link: "https://www.suzukacircuit.jp/tw/" },
+                { time: "17:00", title: "前往名古屋市區", desc: "開車移動", type: "transport" },
+                { time: "19:00", title: "住宿：Airbnb", desc: "愛知縣名古屋市緑區鳴海町字作町26號", type: "hotel", map: "愛知縣名古屋市緑區鳴海町字作町26號" }
+            ]
+        };
+
+        const DEFAULT_CHECKLIST = [
+            { text: "護照 (有效期限6個月以上)", checked: false },
+            { text: "Visit Japan Web 填寫截圖", checked: false },
+            { text: "網卡 / Roaming 開通", checked: false },
+            { text: "日幣現金", checked: false },
+            { text: "信用卡 (海外回饋高)", checked: false },
+            { text: "個人常備藥品", checked: false },
+            { text: "手機充電線 / 行動電源", checked: false }
         ];
 
-        // --- Navigation Logic ---
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderItinerary('d1', ITINERARY.d1);
+            renderItinerary('d2', ITINERARY.d2);
+            loadWallet();
+            loadLists();
+            
+            // Check active tab styling
+            const activeTab = document.querySelector('.nav-btn.active');
+            if(activeTab) activeTab.classList.replace('text-gray-400', 'text-muji-accent');
+        });
+
+        // --- Navigation ---
         function switchTab(tabId) {
-            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+            // Hide all sections
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            // Show target
             document.getElementById(tabId).classList.add('active');
             
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.querySelector(`[data-target="${tabId}"]`)?.classList.add('active');
-            
-            if(tabId === 'wallet') {
-                document.querySelectorAll('.nav-item')[2].classList.add('active');
-            }
-            document.getElementById('main-container').scrollTop = 0;
-        }
-
-        // --- Day Switching Logic ---
-        function switchDay(dayId) {
-            // Hide all day contents
-            document.querySelectorAll('.day-content').forEach(el => el.classList.remove('active'));
-            // Show target
-            document.getElementById('day-' + dayId).classList.add('active');
-            
-            // Update buttons
-            document.querySelectorAll('.day-btn').forEach(el => el.classList.remove('active'));
-            document.querySelector(`button[onclick="switchDay('${dayId}')"]`).classList.add('active');
-        }
-
-        // --- Itinerary Interaction Logic (Synchronized) ---
-        function selectTimeline(element) {
-            // Remove 'active' from siblings
-            const parent = element.parentElement;
-            const siblings = parent.querySelectorAll('.timeline-item');
-            siblings.forEach(el => {
-                if(el !== element) el.classList.remove('active');
+            // Update Nav Icons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-muji-accent');
+                btn.classList.add('text-gray-400');
             });
-            // Toggle clicked
-            element.classList.toggle('active');
+            event.currentTarget.classList.remove('text-gray-400');
+            event.currentTarget.classList.add('text-muji-accent');
+            
+            window.scrollTo(0, 0);
         }
 
-        // --- Wallet Logic (Calculator & LocalStorage) ---
-        let expenses = JSON.parse(localStorage.getItem('neko_expenses')) || [];
-        let rate = parseFloat(localStorage.getItem('neko_rate')) || 0.215;
-        let currentImageBase64 = null;
+        // --- Plan / Itinerary Logic ---
+        function renderItinerary(containerId, items) {
+            const container = document.getElementById(`${containerId}-container`);
+            let html = '';
+            
+            items.forEach((item, index) => {
+                const iconMap = {
+                    flight: 'fa-plane',
+                    transport: 'fa-car',
+                    food: 'fa-utensils',
+                    hotel: 'fa-bed',
+                    play: 'fa-ticket',
+                    car: 'fa-key'
+                };
+                const icon = iconMap[item.type] || 'fa-circle';
+                const bgClass = item.important ? 'bg-orange-50 border-orange-200' : 'bg-white border-transparent';
+                
+                let actionBtns = '';
+                if(item.map) {
+                    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.map)}`;
+                    // Embed logic (simplified iframe due to no API key, falling back to link mostly but showing iframe for visual)
+                    const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(item.map)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                    
+                    actionBtns += `
+                        <div class="mt-3 pt-2 border-t border-dashed border-gray-200">
+                             <iframe class="w-full h-24 rounded-lg bg-gray-100 mb-2 pointer-events-none" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="${embedUrl}"></iframe>
+                             <a href="${mapUrl}" target="_blank" class="text-xs flex items-center gap-1 text-blue-600 font-bold bg-blue-50 px-3 py-2 rounded-lg inline-block w-full text-center">
+                                <i class="fa-solid fa-map-location-dot"></i> 開啟 Google Maps
+                            </a>
+                        </div>
+                    `;
+                }
+                if(item.link) {
+                     actionBtns += `
+                        <div class="mt-2">
+                             <a href="${item.link}" target="_blank" class="text-xs flex items-center gap-1 text-muji-accent font-bold bg-orange-50 px-3 py-2 rounded-lg inline-block w-full text-center">
+                                <i class="fa-solid fa-link"></i> 查看詳情
+                            </a>
+                        </div>
+                    `;
+                }
 
-        document.getElementById('exchange-rate').value = rate;
-        const jpyInput = document.getElementById('jpy-input');
-        const twdDisplay = document.getElementById('twd-display');
+                html += `
+                <div class="flex gap-4 mb-6 relative group cursor-pointer" onclick="toggleItinerary(this)">
+                    <div class="flex flex-col items-center z-10 w-10 shrink-0">
+                        <div class="timeline-dot w-4 h-4 rounded-full bg-gray-300 border-2 border-white shadow-sm transition-all duration-300 ${item.important ? 'bg-muji-accent' : ''}"></div>
+                        <div class="text-[10px] font-bold text-gray-400 mt-1 font-mono">${item.time}</div>
+                    </div>
+                    
+                    <div class="itinerary-card flex-1 p-4 rounded-xl shadow-sm border transition-all duration-300 relative ${bgClass}">
+                        <div class="paw-icon"><i class="fa-solid fa-paw"></i></div>
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-muji-text text-base">${item.title}</h4>
+                            <i class="fa-solid ${icon} text-gray-300 text-sm"></i>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">${item.desc}</p>
+                        ${actionBtns}
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
 
-        jpyInput.addEventListener('input', calculateTotal);
+        function toggleItinerary(el) {
+            // Remove active from others in the same day (optional, or allow multiple)
+            // el.parentElement.querySelectorAll('.itinerary-card').forEach(c => c.classList.remove('selected'));
+            // el.parentElement.querySelectorAll('.timeline-dot').forEach(d => d.classList.remove('selected'));
 
-        function updateRate() {
-            rate = parseFloat(document.getElementById('exchange-rate').value);
-            localStorage.setItem('neko_rate', rate);
-            calculateTotal();
+            const card = el.querySelector('.itinerary-card');
+            const dot = el.querySelector('.timeline-dot');
+            
+            card.classList.toggle('selected');
+            dot.classList.toggle('selected');
+        }
+
+        // --- Wallet Logic ---
+        let expenses = [];
+        let currentPhoto = null;
+
+        function loadWallet() {
+            const saved = localStorage.getItem('trip_expenses');
+            if(saved) expenses = JSON.parse(saved);
             renderExpenses();
+            updateTotal();
         }
 
-        function calculateTotal() {
+        function calcAppend(val) {
+            const display = document.getElementById('calc-display');
+            if(display.value === '0' && val !== '.') display.value = val;
+            else display.value += val;
+            updateTotal();
+        }
+
+        function calcClear() {
+            document.getElementById('calc-display').value = '';
+            document.getElementById('calc-expression').innerText = '';
+            updateTotal();
+        }
+
+        function calcEval() {
+            const display = document.getElementById('calc-display');
+            const exprDisplay = document.getElementById('calc-expression');
             try {
-                const val = jpyInput.value;
-                if(!val) { twdDisplay.innerText = "0"; return 0; }
-                if (/^[0-9+\-*/().\s]*$/.test(val)) {
-                    const totalJpy = Function('"use strict";return (' + val + ')')();
-                    twdDisplay.innerText = Math.round(totalJpy * rate).toLocaleString();
-                    return totalJpy;
-                }
-            } catch (e) {}
-            return 0;
-        }
-
-        function handleImageUpload(input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        const MAX_SIZE = 300;
-                        let width = img.width, height = img.height;
-                        if (width > height) {
-                            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
-                        } else {
-                            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        currentImageBase64 = canvas.toDataURL('image/jpeg', 0.5);
-                        document.getElementById('preview-img').src = currentImageBase64;
-                        document.getElementById('upload-preview').classList.remove('hidden');
-                    }
-                }
-                reader.readAsDataURL(file);
+                // Safe-ish eval for calculator
+                const result = Function('"use strict";return (' + display.value + ')')();
+                exprDisplay.innerText = display.value + ' =';
+                display.value = result;
+                updateTotal();
+            } catch (e) {
+                display.value = 'Error';
             }
         }
 
-        function clearImage() {
-            currentImageBase64 = null;
-            document.getElementById('photo-upload').value = "";
-            document.getElementById('upload-preview').classList.add('hidden');
+        function updateTotal() {
+            const display = document.getElementById('calc-display').value;
+            const rate = parseFloat(document.getElementById('exchange-rate').value) || 0.215;
+            const twdEl = document.getElementById('calc-twd');
+            
+            // Try to evaluate if user is typing (e.g. "500*3")
+            try {
+                const val = Function('"use strict";return (' + (display || 0) + ')')();
+                twdEl.innerText = Math.round(val * rate).toLocaleString();
+            } catch {
+                twdEl.innerText = '-';
+            }
+        }
+
+        function handlePhotoSelect(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Compress image to Base64
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Max dimension 200px for thumbnail (Save storage)
+                    const MAX_SIZE = 200;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_SIZE) {
+                            height *= MAX_SIZE / width;
+                            width = MAX_SIZE;
+                        }
+                    } else {
+                        if (height > MAX_SIZE) {
+                            width *= MAX_SIZE / height;
+                            height = MAX_SIZE;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Low quality jpeg
+                    currentPhoto = canvas.toDataURL('image/jpeg', 0.6);
+                    document.getElementById('photo-indicator').classList.remove('hidden');
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
         }
 
         function addExpense() {
-            const name = document.getElementById('item-name').value;
-            const jpyVal = calculateTotal();
-            if (!name || jpyVal === 0) { alert('請輸入名稱與金額'); return; }
+            const display = document.getElementById('calc-display');
+            const itemInput = document.getElementById('expense-item');
+            
+            // Calc value first if it's an expression
+            try {
+                let amount = Function('"use strict";return (' + (display.value || 0) + ')')();
+                if(amount <= 0 || itemInput.value.trim() === '') {
+                    alert('請輸入金額與品項');
+                    return;
+                }
 
-            const item = { id: Date.now(), name, jpy: jpyVal, img: currentImageBase64, date: new Date().toLocaleDateString() };
-            expenses.unshift(item);
-            saveExpenses();
-            renderExpenses();
-            document.getElementById('item-name').value = '';
-            document.getElementById('jpy-input').value = '';
-            document.getElementById('twd-display').innerText = '0';
-            clearImage();
-        }
+                const expense = {
+                    id: Date.now(),
+                    item: itemInput.value,
+                    amount: amount,
+                    photo: currentPhoto,
+                    date: new Date().toLocaleString()
+                };
+                
+                expenses.unshift(expense);
+                localStorage.setItem('trip_expenses', JSON.stringify(expenses));
+                
+                // Reset form
+                itemInput.value = '';
+                currentPhoto = null;
+                document.getElementById('photo-indicator').classList.add('hidden');
+                document.getElementById('expense-photo').value = ''; // clear file input
+                
+                renderExpenses();
 
-        function saveExpenses() {
-            try { localStorage.setItem('neko_expenses', JSON.stringify(expenses)); }
-            catch (e) { alert('空間不足，請清除舊紀錄。'); }
+            } catch(e) {
+                alert('金額格式錯誤');
+            }
         }
 
         function renderExpenses() {
             const list = document.getElementById('expense-list');
-            list.innerHTML = '';
-            let totalTwd = 0;
-            expenses.forEach((item, index) => {
-                const twd = Math.round(item.jpy * rate);
-                totalTwd += twd;
-                const imgHtml = item.img ? `<img src="${item.img}" class="w-12 h-12 rounded-lg object-cover border border-gray-100 mr-3 shadow-sm">` : `<div class="w-12 h-12 rounded-lg bg-orange-50 mr-3 flex items-center justify-center text-orange-200"><i class="fas fa-shopping-bag"></i></div>`;
-                list.innerHTML += `
-                    <div class="bg-white p-3 rounded-xl shadow-sm flex items-center justify-between border border-gray-50">
-                        <div class="flex items-center overflow-hidden">${imgHtml}<div><div class="font-bold text-gray-700 truncate w-32">${item.name}</div><div class="text-xs text-gray-400">¥ ${parseFloat(item.jpy).toLocaleString()}</div></div></div>
-                        <div class="text-right"><div class="font-bold text-neko-accent">NT$ ${twd.toLocaleString()}</div><button onclick="deleteExpense(${index})" class="text-[10px] text-gray-300 hover:text-red-400 mt-1"><i class="fas fa-trash"></i></button></div>
-                    </div>`;
+            const totalEl = document.getElementById('total-expense');
+            const rate = parseFloat(document.getElementById('exchange-rate').value) || 0.215;
+            
+            let html = '';
+            let totalJPY = 0;
+
+            expenses.forEach(ex => {
+                totalJPY += parseFloat(ex.amount);
+                const twd = Math.round(ex.amount * rate);
+                
+                html += `
+                <div class="flex items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                    ${ex.photo ? `<img src="${ex.photo}" class="w-12 h-12 rounded bg-gray-200 object-cover mr-3 cursor-pointer" onclick="viewImage('${ex.photo}')">` : '<div class="w-12 h-12 rounded bg-gray-100 mr-3 flex items-center justify-center text-gray-300"><i class="fa-solid fa-receipt"></i></div>'}
+                    <div class="flex-1">
+                        <div class="font-bold text-sm text-gray-800">${ex.item}</div>
+                        <div class="text-[10px] text-gray-400">${ex.date.split(' ')[0]}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold font-mono">¥${ex.amount.toLocaleString()}</div>
+                        <div class="text-xs text-gray-400">≈ $${twd.toLocaleString()}</div>
+                    </div>
+                    <button onclick="removeExpense(${ex.id})" class="ml-3 text-gray-300 hover:text-red-400">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+                `;
             });
-            document.getElementById('total-spent').innerText = `總計: NT$ ${totalTwd.toLocaleString()}`;
+            
+            list.innerHTML = html;
+            totalEl.innerText = `(總計 ¥${totalJPY.toLocaleString()})`;
         }
 
-        function deleteExpense(index) {
-            if(confirm('刪除此筆紀錄？')) { expenses.splice(index, 1); saveExpenses(); renderExpenses(); }
+        function removeExpense(id) {
+            if(confirm('確定刪除此筆記錄？')) {
+                expenses = expenses.filter(e => e.id !== id);
+                localStorage.setItem('trip_expenses', JSON.stringify(expenses));
+                renderExpenses();
+            }
         }
+        
         function clearExpenses() {
-            if(confirm('清空所有紀錄？')) { expenses = []; saveExpenses(); renderExpenses(); }
+            if(confirm('確定清除所有記帳資料？無法復原喔！')) {
+                expenses = [];
+                localStorage.setItem('trip_expenses', JSON.stringify(expenses));
+                renderExpenses();
+            }
+        }
+        
+        function viewImage(src) {
+            // Simple modal view could be implemented, for now simple open
+            const w = window.open("");
+            w.document.write('<img src="'+src+'" style="width:100%"/>');
         }
 
-        // --- Lists & Memo Logic ---
-        let checklist = JSON.parse(localStorage.getItem('neko_checklist')) || defaultChecklist;
+        // --- Lists Logic ---
+        let checklist = [];
+
+        function loadLists() {
+            // Checklist
+            const savedCheck = localStorage.getItem('trip_checklist');
+            if(savedCheck) checklist = JSON.parse(savedCheck);
+            else checklist = JSON.parse(JSON.stringify(DEFAULT_CHECKLIST));
+            renderChecklist();
+
+            // Memo
+            const savedMemo = localStorage.getItem('trip_memo');
+            if(savedMemo) {
+                document.getElementById('memo-area').value = savedMemo;
+                parseLinks(savedMemo);
+            }
+        }
+
         function renderChecklist() {
             const container = document.getElementById('checklist-container');
-            container.innerHTML = '';
-            checklist.forEach((item, index) => {
-                container.innerHTML += `<div class="flex items-center p-3 bg-white rounded-xl border border-gray-50 shadow-sm active:scale-[0.98] transition" onclick="toggleCheck(${index})"><div class="w-5 h-5 rounded border flex items-center justify-center mr-3 ${item.checked ? 'bg-neko-accent border-neko-accent text-white' : 'border-gray-300 text-transparent'}"><i class="fas fa-check text-xs"></i></div><span class="${item.checked ? 'text-gray-400 line-through' : 'text-gray-700'} text-sm flex-1">${item.text}</span></div>`;
+            let html = '';
+            checklist.forEach((item, idx) => {
+                html += `
+                <div class="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
+                    <div class="cursor-pointer ${item.checked ? 'text-muji-accent' : 'text-gray-300'}" onclick="toggleCheck(${idx})">
+                        <i class="fa-solid ${item.checked ? 'fa-square-check' : 'fa-square'} text-xl"></i>
+                    </div>
+                    <span class="${item.checked ? 'line-through text-gray-300' : 'text-gray-700'} text-sm flex-1 transition-all">${item.text}</span>
+                    <button onclick="removeCheck(${idx})" class="text-gray-200 hover:text-red-400 px-2"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                `;
             });
-            localStorage.setItem('neko_checklist', JSON.stringify(checklist));
+            container.innerHTML = html;
         }
-        function toggleCheck(index) { checklist[index].checked = !checklist[index].checked; renderChecklist(); }
-        function addTodo() { const val = document.getElementById('new-todo').value.trim(); if(val) { checklist.push({text: val, checked: false}); document.getElementById('new-todo').value=''; renderChecklist(); } }
-        function resetChecklist() { if(confirm('重置清單？')) { checklist = JSON.parse(JSON.stringify(defaultChecklist)); renderChecklist(); } }
 
-        const memoArea = document.getElementById('memo-area');
-        memoArea.value = localStorage.getItem('neko_memo') || '';
-        memoArea.addEventListener('input', () => {
-            localStorage.setItem('neko_memo', memoArea.value);
-            const matches = memoArea.value.match(/(https?:\/\/[^\s]+)/g);
-            document.getElementById('memo-links').innerHTML = matches ? matches.map(url => `<a href="${url}" target="_blank" class="text-[10px] bg-blue-50 text-blue-500 px-2 py-1 rounded-full border border-blue-100 truncate max-w-[150px] inline-block active:scale-95"><i class="fas fa-link mr-1"></i>連結</a>`).join('') : '';
-        });
+        function toggleCheck(idx) {
+            checklist[idx].checked = !checklist[idx].checked;
+            saveChecklist();
+        }
 
-        // Init
-        renderExpenses();
-        renderChecklist();
+        function addCheckItem() {
+            const input = document.getElementById('new-check-item');
+            if(input.value.trim()) {
+                checklist.push({ text: input.value, checked: false });
+                input.value = '';
+                saveChecklist();
+            }
+        }
+
+        function removeCheck(idx) {
+            checklist.splice(idx, 1);
+            saveChecklist();
+        }
+
+        function saveChecklist() {
+            localStorage.setItem('trip_checklist', JSON.stringify(checklist));
+            renderChecklist();
+        }
+
+        function saveMemo() {
+            const val = document.getElementById('memo-area').value;
+            localStorage.setItem('trip_memo', val);
+            parseLinks(val);
+        }
+
+        function parseLinks(text) {
+            const container = document.getElementById('memo-links');
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const matches = text.match(urlRegex);
+            
+            if(matches) {
+                container.innerHTML = matches.map(url => `
+                    <a href="${url}" target="_blank" class="text-xs bg-gray-100 text-blue-600 px-2 py-1 rounded truncate max-w-[150px] inline-block hover:bg-gray-200">
+                        <i class="fa-solid fa-link"></i> ${url.replace(/https?:\/\//, '')}
+                    </a>
+                `).join('');
+            } else {
+                container.innerHTML = '';
+            }
+        }
+
     </script>
 </body>
 </html>
