@@ -94,11 +94,11 @@
         .guide-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease-in-out;
             opacity: 0;
         }
         .guide-content.open {
-            max-height: 2000px; /* 足夠大的高度 */
+            max-height: 3000px; /* 足夠大的高度以容納內容 */
             opacity: 1;
         }
         .guide-arrow {
@@ -106,6 +106,9 @@
         }
         .guide-arrow.open {
             transform: rotate(180deg);
+            background-color: #f97316;
+            color: white;
+            border-color: #f97316;
         }
 
         .guide-tag {
@@ -117,6 +120,7 @@
             font-weight: bold;
             display: inline-block;
             margin-bottom: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .guide-highlight {
             background-color: #ffedd5;
@@ -242,10 +246,12 @@
                     { id: 'd2-7', time: '19:30', title: '住宿：Airbnb', desc: '愛知縣名古屋市緑區', type: 'hotel', addr: '愛知縣名古屋市緑區鳴海町字作町26號' }
                 ],
                 d3: [
-                    { id: 'd3-1', time: '07:30', title: '早餐：便利商店', desc: '選擇下方 7-11 或 FamilyMart', type: 'food', highlight: true },
-                    { id: 'd3-2', time: '', title: '7-11 名古屋浦里5丁目', desc: '地址：名古屋市緑区浦里5-203', type: 'shop', addr: '名古屋市緑区浦里5-203' },
-                    { id: 'd3-3', time: '', title: '7-11 名古屋藥師山', desc: '地址：名古屋市緑区鳴海町字薬師山179-1', type: 'shop', addr: '名古屋市緑区鳴海町字薬師山179-1' },
-                    { id: 'd3-4', time: '', title: 'FamilyMart 潮見之丘', desc: '地址：名古屋市緑区潮見が丘1-79', type: 'shop', addr: '名古屋市緑区潮見が丘1-79' }
+                    { id: 'd3-1', time: '07:00', title: '早餐：超商巡禮', desc: '停留30分鐘，點擊下方按鈕導航', type: 'food', highlight: true },
+                    { id: 'd3-sub1', time: '', title: '7-11 名古屋浦里5丁目', desc: '第一站', type: 'shop', addr: '名古屋市緑区浦里5-203' },
+                    { id: 'd3-sub2', time: '', title: '7-11 名古屋藥師山', desc: '第二站', type: 'shop', addr: '名古屋市緑区鳴海町字薬師山179-1' },
+                    { id: 'd3-sub3', time: '', title: 'FamilyMart 潮見之丘', desc: '第三站', type: 'shop', addr: '名古屋市緑区潮見が丘1-79' },
+                    { id: 'd3-2', time: '08:00', title: '前往吉卜力公園', desc: '停：吉卜力公園北口停車場', type: 'transport', addr: '1533-1 Ibaragabasama, Nagakute, Aichi 480-1342日本' },
+                    { id: 'd3-3', time: '08:15', title: '吉卜力攻略開始', desc: '詳見「導覽 Guide」頁面', type: 'play', highlight: true }
                 ]
             },
             checklist: ['護照', '網卡/漫遊', '日幣現金', '信用卡', '駕照日文譯本', '行動電源', '保暖衣物', '個人藥品', 'Hotmail 乘車卷']
@@ -408,7 +414,10 @@
 
         // --- 2. GUIDE MODULE ---
         function renderGuide(container) {
-            // Images array (Converted to raw for direct access)
+            // Helper to get raw GitHub URL
+            const toRaw = (url) => url.replace('blob', 'raw');
+
+            // Images array
             const parkingImages = [
                 "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-1.png",
                 "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-2.png",
@@ -421,6 +430,15 @@
                 "https://github.com/LulumeQQ/NGO-202602/raw/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-2.png",
                 "https://github.com/LulumeQQ/NGO-202602/raw/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-3.png"
             ];
+
+            const ghibliParkingImg = "https://github.com/LulumeQQ/NGO-202602/raw/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%8C%971%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3.png";
+            
+            const ghibliApmImages = [
+                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%8C%971%E5%81%9C%E8%BB%8A%E5%A0%B4-APM%E8%B3%BC%E7%A5%A8%E8%99%95.jpg",
+                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%8C%971%E5%81%9C%E8%BB%8A%E5%A0%B4-APM%E8%B3%BC%E7%A5%A8%E8%99%952.jpg"
+            ];
+            
+            const ghibliStrategyImg = "https://github.com/LulumeQQ/NGO-202602/raw/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E6%94%BB%E7%95%A5.png";
 
             const loginUrl = "https://d-reserve.jp/auth/realms/M000000678/protocol/openid-connect/auth?response_type=code&client_id=directin-s4&redirect_uri=https%3A%2F%2Fd-reserve.jp%2Fguest-reserve-front%2Fsso%2Flogin?hotelCode%3D0000001590%26return_url%3Dhttps%253A%252F%252Fd-reserve.jp%252Fauth%252Frealms%252Fdirectin-s4%252Fcdp%252Fgroups%252FM000000678%252Fredirects%252Faccount%253Freferrer_uri%253Dhttps%25253A%25252F%25252Fd-reserve.jp%25252FGSEA001F01300%25252FGSEA001A01%25253FhotelCode%25253D0000001590%252526lang%25253Den&state=faadacc5-08c9-485f-972f-9681fbea58dd&login=true&ui_locales=en&scope=openid";
 
@@ -528,10 +546,66 @@
                 </div>
             `;
 
+            // Content for Ghibli Park
+            const ghibliContent = `
+                <div class="mb-8">
+                     <h3 class="font-bold text-lg text-muji-text mb-3 border-l-4 border-cat-orange pl-3">1. 北口停車場 & APM</h3>
+                     <div class="grid grid-cols-2 gap-2 mb-2">
+                        <div class="scroll-item h-32">
+                             <img src="${ghibliParkingImg}" class="w-full h-full object-cover" onclick="showFullImage('${ghibliParkingImg}')">
+                        </div>
+                        <div class="scroll-item h-32">
+                             <img src="${ghibliApmImages[0]}" class="w-full h-full object-cover" onclick="showFullImage('${ghibliApmImages[0]}')">
+                        </div>
+                     </div>
+                </div>
+
+                <div class="mb-8">
+                     <h3 class="font-bold text-lg text-muji-text mb-3 border-l-4 border-cat-orange pl-3">2. 攻略地圖</h3>
+                     <img src="${ghibliStrategyImg}" class="w-full rounded-xl shadow-sm mb-2" onclick="showFullImage('${ghibliStrategyImg}')">
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-lg text-muji-text mb-3 border-l-4 border-cat-orange pl-3">3. 週日逆向攻略 (08:15~)</h3>
+                    <div class="space-y-4 text-sm text-gray-700 leading-relaxed">
+                        
+                        <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                            <span class="text-xs font-bold bg-cat-orange text-white px-2 py-0.5 rounded">08:15 關鍵起跑</span>
+                            <p class="mt-1 font-bold">搶購 APM 貓巴士票</p>
+                            <p class="text-xs text-gray-600 mt-1">地點：魔法公主之里旁自動售票機。<br>目標：買 09:00-09:30 往「咚咚吭之森」的票。</p>
+                        </div>
+
+                        <div class="pl-2 border-l-2 border-gray-200 ml-2 space-y-4">
+                            <div>
+                                <strong class="text-cat-orange">09:15 咚咚吭之森</strong>
+                                <p class="text-xs text-gray-500">參觀小梅與小月之家 (Premium)。爬後山看大龍貓。</p>
+                            </div>
+                            <div>
+                                <strong class="text-cat-orange">10:35 魔女之谷 (重點!)</strong>
+                                <ul class="list-disc pl-4 text-xs text-gray-600 mt-1 space-y-1">
+                                    <li><strong class="text-gray-800">霍爾移動城堡</strong>：必看一樓卡西法、二樓臥室。</li>
+                                    <li><strong class="text-gray-800">歐其諾大宅</strong>：琪琪老家，粉紅臥室超美。</li>
+                                    <li><strong class="text-gray-800">麵包店</strong>：人多建議拍櫥窗就好。</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong class="text-cat-orange">12:00 青春之丘</strong>
+                                <p class="text-xs text-gray-500">貓咪事務所 (袖珍屋) & 地球屋。</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-red-50 p-3 rounded-lg text-xs text-red-600">
+                            <i class="fa-solid fa-triangle-exclamation mr-1"></i>建築內部大多禁止拍照，請依現場指示。
+                        </div>
+                    </div>
+                </div>
+            `;
+
             container.innerHTML = `
             <div class="p-6 space-y-8">
                 ${createGuideCard('jr', 'JR Gate Tower', 'Shopping', jrContent, parkingImages[0])}
                 ${createGuideCard('suzuka', '鈴鹿賽道飯店', 'Hotel', suzukaContent, suzukaImages[0])}
+                ${createGuideCard('ghibli', '吉卜力公園', 'Theme Park', ghibliContent, ghibliStrategyImg)}
             </div>`;
         }
 
