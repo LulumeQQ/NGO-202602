@@ -32,7 +32,7 @@
                         'floating': '0 10px 25px rgba(234, 88, 12, 0.15)',
                     },
                     animation: {
-                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'fade-in': 'fadeIn 0.4s ease-out',
                     },
                     keyframes: {
                         fadeIn: {
@@ -110,7 +110,7 @@
             opacity: 0;
         }
         .guide-content.open {
-            max-height: 8000px; /* 增加高度以容納長內容 */
+            max-height: 8000px;
             opacity: 1;
         }
         .guide-arrow {
@@ -257,7 +257,7 @@
                     { time: '07:35', title: '起飛 (CI 0154)', desc: '飛往名古屋', type: 'flight' },
                     { time: '11:05', title: '抵達名古屋', desc: '中部國際機場', type: 'arrival' },
                     { time: '12:00', title: '取車 (AQ Relax)', desc: '停留：30分鐘\n地址：〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一', type: 'car', addr: '〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一, 日本' },
-                    { time: '13:30', title: '午餐 (JR Gate Tower)', desc: '逛 Bic Camera，停留3小時\n停車：タワーズ一般駐車場 南口入口', type: 'shop', addr: '1 Chome-26-34 Meiekiminami, Nakamura Ward, Nagoya, Aichi 450-0003日本' },
+                    { time: '13:00', title: '午餐 (JR Gate Tower)', desc: '逛 Bic Camera，停留3小時\n停車：タワーズ一般駐車場 南口入口', type: 'shop', addr: '1 Chome-26-34 Meiekiminami, Nakamura Ward, Nagoya, Aichi 450-0003日本' },
                     { time: '17:00', title: '住宿：鈴鹿賽道樂園酒店', desc: '北棟賽車房 | 含早晚餐\n含4張樂園護照與賽道貴休息室卷', type: 'hotel', addr: '鈴鹿サーキット駐車場 M2, 日本〒510-0201 Mie, Suzuka, Inoucho, 7992' },
                     { time: '19:30', title: '晚餐', desc: '飯店自助晚餐', type: 'food' }
                 ],
@@ -295,7 +295,7 @@
                 d7: [
                     { time: '07:30', title: '早餐', desc: '白樺渡假池之平飯店(新本館)', type: 'food' },
                     { time: '09:00', title: '車山高原滑雪場', desc: '半日滑雪 & 中餐', type: 'person-skiing', addr: '日本〒391-0301 Nagano, Chino, Kitayama, 車山3413' },
-                    { time: '18:00', title: '晚餐選項 1：矢場丼', desc: '味噌炸豬排\nAEON MALL Nagoya Dome', type: 'food', highlight: true, addr: 'AEON MALL NAGOYA DOME MAE, 4 Chome-102-3 Yadaminami, Higashi Ward, Nagoya, Aichi 461-0048日本' },
+                    { time: '18:00', title: '晚餐選項 1：矢場丼', desc: '味噌炸豬排\nAEON MALL Nagoya Dome', type: 'food', highlight: true, addr: 'AEON Mall Nagoya Dome Mae Heimen Parking Lot, 4 Chome-1-4 Yadaminami, Higashi Ward, Nagoya, Aichi 461-0048日本' },
                     { time: '18:00', title: '晚餐選項 2：熱田蓬萊軒', desc: '鰻魚飯\n(依現場狀況二選一)', type: 'food', highlight: true, addr: '熱田蓬萊軒 本店503 Godocho, Atsuta Ward, Nagoya, Aichi 456-0043日本' },
                     { time: '20:00', title: '住宿：Airbnb', desc: '名古屋市區', type: 'hotel', addr: '1-chōme-43-6 Yutaka, Nagoya, Aichi 457-0863' }
                 ],
@@ -303,7 +303,7 @@
                     { time: '08:00', title: '早餐：客美多咖啡 忠次店', desc: '名古屋式早餐', type: 'food', addr: '日本〒457-0843 Aichi, Nagoya, Minami Ward, Chuji, 2 Chome−1−1' },
                     { time: '10:00', title: '常滑招財貓通', desc: '常滑市陶瓷器會館停車場', type: 'play', addr: '日本〒479-0836 Aichi, Tokoname, Sakaemachi, 3 Chome−8' },
                     { time: '12:00', title: '中餐：丸葉食堂', desc: '必點炸大蝦定食', type: 'food', addr: '日本〒479-0882 Aichi, Tokoname, Rinkucho, 3 Chome−9-5' },
-                    { time: '14:00', title: 'AEON 常滑', desc: '購物', type: 'shop', addr: '2 Chome-20-3 Rinkucho, Tokoname, Aichi 479-0882日本' },
+                    { time: '14:00', title: 'AEON 常滑', desc: '購物 (Otafuku Giant Cat)', type: 'shop', addr: 'Otafuku the Giant Beckoning Cat, 2 Chome Rinkucho, Tokoname, Aichi 479-0882日本' },
                     { time: '17:00', title: '還車 (AQ Relax)', desc: '中部國際機場', type: 'car', addr: '〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一, 日本' },
                     { time: '17:30', title: '買伴手禮', desc: 'T1 3F銘品館 / 4F商店街\n坂角總本舖(蝦餅)、兩口屋是清、世界的山將(仙貝)', type: 'shop', highlight: true },
                     { time: '19:00', title: '晚餐', desc: 'T1 4F 餐廳\n世界的山將(雞翅)、まるや鰻魚飯、矢場豬排', type: 'food', highlight: true },
@@ -453,10 +453,9 @@
             const btn = document.getElementById(`btn-${day}`);
             const container = document.getElementById('day-switcher');
             if (btn && container) {
-                // Calculate scroll position to place the selected button at the start (or slightly before)
-                // We don't want to center it, we want to see what's coming next.
-                // Scroll to the button's position minus a small padding
-                const scrollLeft = btn.offsetLeft - container.offsetLeft - 20; 
+                // Scroll to the button's position minus a small padding to keep it on the left
+                // allowing next buttons to be visible
+                const scrollLeft = btn.offsetLeft - container.offsetLeft - 16; 
                 container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
             }
             
@@ -981,6 +980,7 @@
                         查看名古屋 (日本氣象廳)
                     </a>
                 </div>
+                
                 <div class="bg-red-50 p-5 rounded-2xl shadow-sm border border-red-100">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-phone"></i></div>
@@ -995,6 +995,32 @@
                         090-8794-4568 (緊急)
                     </div>
                 </div>
+
+                <div class="bg-purple-50 p-5 rounded-2xl shadow-sm border border-purple-100">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center"><i class="fa-solid fa-plane-up"></i></div>
+                        <h3 class="font-bold text-purple-900">華航行李須知</h3>
+                    </div>
+                    <div class="space-y-3 text-sm text-gray-700">
+                        <div class="bg-white p-3 rounded-xl">
+                            <p class="font-bold text-purple-700 mb-1">🧳 托運行李 (經濟艙)</p>
+                            <p class="text-xs">計件制：通常為 <strong>2件</strong>，每件限重 <strong>23kg</strong>。</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl">
+                            <p class="font-bold text-purple-700 mb-1">🎒 手提行李</p>
+                            <p class="text-xs">1件 (7kg) + 1件個人隨身物品。</p>
+                        </div>
+                        <ul class="list-disc pl-5 text-xs space-y-1 text-gray-600">
+                            <li><strong>鋰電池/行動電源：</strong>務必<span class="text-red-500 font-bold">隨身攜帶</span>，不可托運。</li>
+                            <li><strong>液體：</strong>隨身攜帶單瓶不可超過 100ml，需裝於 1L 透明夾鏈袋。</li>
+                            <li><strong>打火機：</strong>限隨身攜帶 1 個 (藍焰防風型禁止)。</li>
+                        </ul>
+                        <a href="https://www.china-airlines.com/tw/zh/fly/prepare-for-the-fly/baggage/baggage-rules" target="_blank" class="block w-full bg-purple-200 text-purple-800 text-center py-2 rounded-lg text-xs font-bold mt-2">
+                            查看官網詳細規定
+                        </a>
+                    </div>
+                </div>
+
                  <div class="bg-white p-5 rounded-2xl shadow-soft">
                     <h3 class="font-bold text-muji-text mb-3"><i class="fa-solid fa-triangle-exclamation text-yellow-500 mr-2"></i>注意事項</h3>
                     <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
