@@ -309,21 +309,30 @@
             checklist: {
                 luggage: {
                     title: '旅遊行李清單',
+                    icon: 'fa-suitcase-rolling',
+                    color: 'text-blue-500',
                     items: [
-                        '護照x4', '外幣', 'E-SIM', '台灣駕照+日文譯本', '信用卡',
-                        '發熱衣褲x1x4', '衣服x3x4', '褲子x2x4', '內衣褲x8', '襪子x6', '背心x1x3', '圍巾',
-                        '洗面乳', '卸妝乳', '化妝品', '保養品', '乳液', '護唇膏', '防晒', '牙刷', '牙膏',
-                        '泳衣x4', '泳帽x4', '蛙鏡x4', '浴巾x4', '折疊衣架',
-                        '尿布', '衛生棉', '面紙', '濕紙巾',
-                        '手機/手錶充電線', '充電Hub', '各種充電線材', '充氣幫浦',
-                        '備用藥', '克流感', '指甲刀', '體溫計', '口罩', '日常藥膏', '暈車藥'
+                        {n:'護照x4', i:'fa-passport'}, {n:'外幣', i:'fa-coins'}, {n:'E-SIM', i:'fa-sim-card'}, 
+                        {n:'駕照+譯本', i:'fa-id-card'}, {n:'信用卡', i:'fa-credit-card'}, {n:'發熱衣x4', i:'fa-temperature-arrow-up'},
+                        {n:'衣服x3x4', i:'fa-shirt'}, {n:'褲子x2x4', i:'fa-layer-group'}, {n:'內衣褲x8', i:'fa-socks'},
+                        {n:'襪子x6', i:'fa-socks'}, {n:'背心x3', i:'fa-vest'}, {n:'圍巾', i:'fa-snowflake'},
+                        {n:'洗面乳/卸妝', i:'fa-pump-soap'}, {n:'化妝/保養', i:'fa-spray-can-sparkles'}, {n:'防晒/護唇', i:'fa-sun'},
+                        {n:'牙刷牙膏', i:'fa-tooth'}, {n:'泳衣/帽/鏡', i:'fa-person-swimming'}, {n:'浴巾x4', i:'fa-rug'},
+                        {n:'折疊衣架', i:'fa-shirt'}, {n:'尿布/濕紙巾', i:'fa-baby'}, {n:'充電線/Hub', i:'fa-plug'},
+                        {n:'充氣幫浦', i:'fa-wind'}, {n:'備用藥/口罩', i:'fa-pills'}, {n:'指甲刀/暈車', i:'fa-kit-medical'}
                     ]
                 },
                 ski: {
                     title: '滑雪清單',
+                    icon: 'fa-person-skiing',
+                    color: 'text-cat-orange',
                     items: [
-                        '雪衣x4', '雪褲x4', '排汗衣褲x4', '中層保暖x4', '雪鏡x4', '面罩x4', '毛帽x4',
-                        '防摔褲x4', '護膝x4', '護肘x2(小孩)', '雪襪x4', '手套x4', '內層手套x2(大人)'
+                        {n:'雪衣x4', i:'fa-person-skiing'}, {n:'雪褲x4', i:'fa-person-snowboarding'}, 
+                        {n:'排汗衣褲x4', i:'fa-shirt'}, {n:'中層保暖x4', i:'fa-layer-group'}, 
+                        {n:'雪鏡x4', i:'fa-glasses'}, {n:'面罩x4', i:'fa-mask-face'}, 
+                        {n:'毛帽x4', i:'fa-snowflake'}, {n:'防摔褲x4', i:'fa-shield-halved'}, 
+                        {n:'護膝x4', i:'fa-bone'}, {n:'護肘x2', i:'fa-bandage'}, 
+                        {n:'雪襪x4', i:'fa-socks'}, {n:'手套x4', i:'fa-mitten'}, {n:'內層手套', i:'fa-hand-paper'}
                     ]
                 }
             }
@@ -810,25 +819,39 @@
 
         // --- 4. LISTS MODULE ---
         function renderLists(container) {
-            // Expand/Collapse logic embedded in render
             container.innerHTML = `
             <div class="p-4 space-y-6">
+                <div class="grid grid-cols-2 gap-4">
+                    ${Object.keys(tripData.checklist).map(key => {
+                        const list = tripData.checklist[key];
+                        return `
+                        <div class="bg-white rounded-3xl p-5 shadow-soft cursor-pointer hover:shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center gap-3 h-32" onclick="toggleList('${key}')">
+                            <i class="fa-solid ${list.icon} text-4xl ${list.color}"></i>
+                            <h3 class="font-bold text-muji-text text-sm">${list.title}</h3>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+
                 ${Object.keys(tripData.checklist).map(key => {
                     const list = tripData.checklist[key];
                     return `
-                    <div class="bg-white rounded-3xl p-5 shadow-soft">
-                        <div class="flex justify-between items-center mb-4 border-l-4 border-cat-orange pl-3 cursor-pointer" onclick="document.getElementById('list-${key}').classList.toggle('hidden')">
+                    <div id="list-content-${key}" class="hidden bg-white rounded-3xl p-5 shadow-soft animate-fade-in">
+                        <div class="flex justify-between items-center mb-4 border-l-4 border-cat-orange pl-3">
                              <h3 class="font-bold text-muji-text">${list.title}</h3>
-                             <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                             <button onclick="toggleList('${key}')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
                         </div>
-                        <div id="list-${key}" class="grid grid-cols-2 gap-x-4 gap-y-2">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-3">
                              ${list.items.map(item => `
-                                <label class="flex items-start space-x-2 p-1 cursor-pointer group">
-                                    <div class="relative flex items-center mt-0.5">
-                                        <input type="checkbox" onchange="toggleCheck('${item}')" ${checklistState[item] ? 'checked' : ''} class="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 transition-all checked:border-cat-orange checked:bg-cat-orange">
+                                <label class="flex items-center space-x-2 p-2 rounded-lg bg-gray-50 hover:bg-orange-50 cursor-pointer group transition-colors">
+                                    <div class="relative flex items-center flex-shrink-0">
+                                        <input type="checkbox" onchange="toggleCheck('${item.n}')" ${checklistState[item.n] ? 'checked' : ''} class="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 transition-all checked:border-cat-orange checked:bg-cat-orange">
                                         <i class="fa-solid fa-check text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] opacity-0 peer-checked:opacity-100 pointer-events-none"></i>
                                     </div>
-                                    <span class="text-xs text-gray-600 peer-checked:text-gray-300 peer-checked:line-through leading-tight">${item}</span>
+                                    <div class="flex items-center gap-1.5 min-w-0">
+                                        <i class="fa-solid ${item.i} text-[10px] text-gray-400 group-hover:text-cat-orange"></i>
+                                        <span class="text-xs text-gray-600 peer-checked:text-gray-300 peer-checked:line-through truncate font-medium">${item.n}</span>
+                                    </div>
                                 </label>
                              `).join('')}
                         </div>
@@ -836,7 +859,7 @@
                     `;
                 }).join('')}
 
-                <div class="bg-white rounded-3xl p-5 shadow-soft h-[400px] flex flex-col">
+                <div class="bg-white rounded-3xl p-5 shadow-soft h-[300px] flex flex-col">
                     <h3 class="font-bold text-muji-text mb-2 border-l-4 border-cat-orange pl-3">備忘錄</h3>
                     <textarea id="memo-area" class="flex-1 w-full bg-muji-bg rounded-xl p-3 text-sm leading-relaxed outline-none resize-none border border-transparent focus:border-cat-orange" placeholder="輸入網址會自動變成按鈕...">${memoContent}</textarea>
                     <div class="mt-3 flex justify-between items-center">
@@ -848,10 +871,21 @@
             updateMemoLinks();
         }
 
+        function toggleList(key) {
+            // Hide all lists first
+            document.querySelectorAll('[id^="list-content-"]').forEach(el => el.classList.add('hidden'));
+            // Show selected
+            const target = document.getElementById(`list-content-${key}`);
+            if(target) {
+                target.classList.remove('hidden');
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
         function toggleCheck(item) {
             checklistState[item] = !checklistState[item];
             localStorage.setItem('trip_checklist', JSON.stringify(checklistState));
-            // Re-render is optional but nice for instant feedback, though CSS handles line-through
+            // Optional: Re-render to show strikethrough updates immediately if CSS peer-checked isn't enough (it is enough here)
         }
 
         function saveMemo() {
