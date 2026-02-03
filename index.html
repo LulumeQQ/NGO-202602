@@ -2,15 +2,73 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日本中部自駕遊行程表 (D7-D8)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>名古屋滑雪之旅</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cat-orange': '#ea580c', // 深橘色
+                        'cat-light': '#fff7ed', // 淺橘底
+                        'bg-paper': '#fdfcf0', // 無印風米白
+                        'text-dark': '#4b5563',
+                    },
+                    fontFamily: {
+                        sans: ['"Zen Maru Gothic"', '"Noto Sans TC"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
         body {
-            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
-            background-color: #f3f4f6;
+            background-color: #fdfcf0;
+            color: #333;
+            -webkit-tap-highlight-color: transparent;
         }
+        
+        /* 隱藏捲軸但保留功能 */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* 底部導航欄選取特效 */
+        .nav-item.active {
+            color: #ea580c;
+        }
+        .nav-item.active i {
+            transform: translateY(-2px);
+        }
+
+        /* 行程卡片選取特效 */
+        .plan-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .plan-card.selected {
+            border-color: #ea580c;
+            background-color: #fff7ed;
+            box-shadow: 0 4px 6px -1px rgba(234, 88, 12, 0.1), 0 2px 4px -1px rgba(234, 88, 12, 0.06);
+        }
+        .paw-icon {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .plan-card.selected .paw-icon {
+            opacity: 1;
+        }
+        
+        /* 時間軸樣式 */
         .timeline-line {
             position: absolute;
             left: 20px;
@@ -20,329 +78,629 @@
             background-color: #e5e7eb;
             z-index: 0;
         }
-        .card {
-            transition: transform 0.2s;
+        .plan-card.selected ~ .timeline-dot {
+            background-color: #ea580c;
+            border-color: #fff7ed;
         }
-        /* .card:hover {
-            transform: translateY(-2px);
-        } */
-        .badge-time {
-            background-color: #3b82f6;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.85rem;
+
+        /* 載入動畫 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .tag {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
-        .tag-food { background-color: #fee2e2; color: #991b1b; }
-        .tag-spot { background-color: #d1fae5; color: #065f46; }
-        .tag-hotel { background-color: #e0e7ff; color: #3730a3; }
-        .tag-shop { background-color: #fef3c7; color: #92400e; }
-        
-        .nav-btn.active {
-            background-color: #2563eb;
-            color: white;
-            border-color: #2563eb;
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
         }
     </style>
 </head>
-<body>
+<body class="pb-24 pt-16">
 
-    <div class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 p-4">
-        <div class="max-w-3xl mx-auto flex justify-center space-x-4">
-            <button onclick="switchDay('d7')" id="btn-d7" class="nav-btn active px-6 py-2 border-2 border-gray-300 rounded-full font-bold text-gray-600 transition-colors duration-300 hover:bg-blue-100">
-                Day 7 (長野/名古屋)
+    <header class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-sm z-50 h-16 flex items-center justify-center px-4">
+        <h1 class="text-xl font-bold text-gray-800 tracking-wider flex items-center gap-2">
+            <i class="fas fa-snowflake text-cat-orange"></i>
+            名古屋滑雪之旅
+            <i class="fas fa-cat text-cat-orange"></i>
+        </h1>
+    </header>
+
+    <main id="app-container" class="container mx-auto max-w-md px-4 min-h-screen">
+        </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 pb-safe">
+        <div class="flex justify-around items-center h-16 max-w-md mx-auto">
+            <button onclick="router('plan')" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-cat-orange active" id="nav-plan">
+                <i class="fas fa-map-marked-alt text-xl mb-1"></i>
+                <span class="text-xs">行程</span>
             </button>
-            <button onclick="switchDay('d8')" id="btn-d8" class="nav-btn px-6 py-2 border-2 border-gray-300 rounded-full font-bold text-gray-600 transition-colors duration-300 hover:bg-blue-100">
-                Day 8 (常滑/機場)
+            <button onclick="router('guide')" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-cat-orange" id="nav-guide">
+                <i class="fas fa-book-open text-xl mb-1"></i>
+                <span class="text-xs">導覽</span>
+            </button>
+            <button onclick="router('wallet')" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-cat-orange" id="nav-wallet">
+                <i class="fas fa-wallet text-xl mb-1"></i>
+                <span class="text-xs">記帳</span>
+            </button>
+            <button onclick="router('lists')" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-cat-orange" id="nav-lists">
+                <i class="fas fa-tasks text-xl mb-1"></i>
+                <span class="text-xs">清單</span>
+            </button>
+            <button onclick="router('info')" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-cat-orange" id="nav-info">
+                <i class="fas fa-info-circle text-xl mb-1"></i>
+                <span class="text-xs">資訊</span>
             </button>
         </div>
-    </div>
-
-    <div class="max-w-3xl mx-auto pt-24 pb-12 px-4">
-        
-        <div id="content-d7" class="day-content relative">
-            <div class="timeline-line ml-4 md:ml-0"></div>
-            
-            <div class="flex mb-8 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-coffee"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card">
-                    <div class="flex items-center mb-2">
-                        <span class="badge-time mr-2">07:30</span>
-                        <h3 class="text-lg font-bold text-gray-800">早餐：池之平飯店</h3>
-                    </div>
-                    <div class="text-gray-600 text-sm mb-2">
-                        <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
-                        1596 Ashidahakkano, Tateshina, Kitasaku District, Nagano 391-0321日本
-                    </div>
-                    
-                </div>
-            </div>
-
-            <div class="flex mb-8 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-snowflake"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card">
-                    <div class="flex items-center mb-2">
-                        <span class="tag tag-spot">景點</span>
-                        <h3 class="text-lg font-bold text-gray-800">中餐 & 車山高原滑雪場</h3>
-                    </div>
-                    <div class="text-gray-600 text-sm mb-2">
-                        <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
-                        日本〒391-0301 Nagano, Chino, Kitayama, 車山3413
-                    </div>
-                     
-                </div>
-            </div>
-
-            <div class="flex mb-4 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-utensils"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card border-l-4 border-l-red-500">
-                    <div class="flex items-center mb-2">
-                        <span class="tag tag-food">晚餐選項 1</span>
-                        <h3 class="text-lg font-bold text-gray-800">矢場丼 (味噌炸豬排)</h3>
-                    </div>
-                    <p class="text-gray-700 font-medium mb-1">地點：AEON MALL NAGOYA DOME MAE (永旺夢樂城)</p>
-                    <div class="text-gray-600 text-sm mb-2">
-                        <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
-                        4 Chome-102-3 Yadaminami, Higashi Ward, Nagoya, Aichi 461-0048日本
-                    </div>
-                    
-                </div>
-            </div>
-
-            <div class="flex mb-8 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-400 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-utensils"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card border-l-4 border-l-red-400">
-                    <div class="flex items-center mb-2">
-                        <span class="tag tag-food">晚餐選項 2</span>
-                        <h3 class="text-lg font-bold text-gray-800">熱田蓬萊軒 (鰻魚飯)</h3>
-                    </div>
-                    <div class="text-gray-600 text-sm mb-2">
-                        <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
-                        503 Godocho, Atsuta Ward, Nagoya, Aichi 456-0043日本
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex mb-8 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-bed"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card">
-                    <div class="flex items-center mb-2">
-                        <span class="tag tag-hotel">住宿</span>
-                        <h3 class="text-lg font-bold text-gray-800">Airbnb (Nagoya)</h3>
-                    </div>
-                    <div class="text-gray-600 text-sm">
-                        <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
-                        1-chōme-43-6 Yutaka, Nagoya, Aichi 457-0863
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="content-d8" class="day-content relative hidden">
-            <div class="timeline-line ml-4 md:ml-0"></div>
-
-            <div class="flex mb-8 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-coffee"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card">
-                    <div class="flex items-center mb-2">
-                        <span class="tag tag-food">早餐</span>
-                        <h3 class="text-lg font-bold text-gray-800">客美多咖啡 忠次店</h3>
-                    </div>
-                    <div class="text-gray-600 text-sm mb-2">
-                        <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
-                        日本〒457-0843 Aichi, Nagoya, Minami Ward, Chuji, 2 Chome−1−1
-                    </div>
-                     
-                </div>
-            </div>
-
-            <div class="flex mb-8 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-camera"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card">
-                    <div class="flex items-center mb-2">
-                        <span class="tag tag-spot">景點</span>
-                        <h3 class="text-lg font-bold text-gray-800">常滑招財貓通</h3>
-                    </div>
-                    <p class="text-sm text-gray-500 mb-1">停車：常滑市陶瓷器會館停車場</p>
-                    <div class="text-gray-600 text-sm mb-2">
-                        <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
-                        日本〒479-0836 Aichi, Tokoname, Sakaemachi, 3 Chome−8
-                    </div>
-                    
-                </div>
-            </div>
-
-            <div class="flex mb-8 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-utensils"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card">
-                    <div class="flex items-center mb-2">
-                        <span class="tag tag-food">中餐</span>
-                        <h3 class="text-lg font-bold text-gray-800">活魚料理 丸葉食堂 臨空常滑店</h3>
-                    </div>
-                    <div class="bg-yellow-50 p-2 rounded text-sm text-yellow-800 mb-2 font-bold">
-                        <i class="fas fa-star text-yellow-500 mr-1"></i> 必點：炸大蝦定食 (エビフライ定食)
-                    </div>
-                    <div class="text-gray-600 text-sm mb-2">
-                        <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
-                        日本〒479-0882 Aichi, Tokoname, Rinkucho, 3 Chome−9-5
-                    </div>
-                    
-                </div>
-            </div>
-
-            <div class="flex mb-8 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-500 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-shopping-bag"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card">
-                    <div class="flex items-center mb-2">
-                        <span class="tag tag-shop">購物</span>
-                        <h3 class="text-lg font-bold text-gray-800">AEON 常滑</h3>
-                    </div>
-                    <div class="text-gray-600 text-sm mb-2">
-                        <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
-                        2 Chome-20-3 Rinkucho, Tokoname, Aichi 479-0882日本
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex mb-8 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-700 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-car"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card">
-                    <div class="flex items-center mb-2">
-                        <span class="badge-time mr-2">17:00</span>
-                        <h3 class="text-lg font-bold text-gray-800">還車 (AQ Relax-Rentacar)</h3>
-                    </div>
-                    <div class="text-gray-600 text-sm mb-2">
-                        <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
-                        〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex mb-8 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-pink-500 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-gift"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card">
-                    <div class="flex items-center mb-2">
-                        <span class="tag tag-shop">買伴手禮</span>
-                        <h3 class="text-lg font-bold text-gray-800">中部國際機場</h3>
-                    </div>
-                    <p class="text-xs text-gray-500 mb-3">第1航廈3樓出境大廳的「銘品館」或4樓商店街</p>
-                    <ul class="space-y-2">
-                        <li class="flex items-start">
-                            <span class="text-pink-500 font-bold mr-2">1.</span>
-                            <span>坂角總本舖 - 蝦餅 (Yukari / ゆかり)</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-pink-500 font-bold mr-2">2.</span>
-                            <span>兩口屋是清 - 千拿瑞 (Sennari)</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-pink-500 font-bold mr-2">3.</span>
-                            <span>世界的山將 - 幻之手羽先風味餅乾/仙貝</span>
-                        </li>
-                    </ul>
-                     
-                </div>
-            </div>
-
-            <div class="flex mb-8 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-utensils"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card">
-                    <div class="flex items-center mb-2">
-                        <span class="tag tag-food">晚餐</span>
-                        <h3 class="text-lg font-bold text-gray-800">中部國際機場 (第1航廈4樓)</h3>
-                    </div>
-                    <ul class="space-y-2 divide-y divide-gray-100">
-                        <li class="pt-2">
-                            <span class="font-bold text-gray-700">1. 世界的山將</span>
-                            <span class="text-gray-500 text-sm block">新特麗亞店</span>
-                        </li>
-                        <li class="pt-2">
-                            <span class="font-bold text-gray-700">2. まるや鰻魚飯三吃</span>
-                            <span class="text-gray-500 text-sm block">名古屋中部機場分店</span>
-                             
-                        </li>
-                        <li class="pt-2">
-                            <span class="font-bold text-gray-700">3. 矢場味噌豬排</span>
-                            <span class="text-gray-500 text-sm block">中部國際機場店</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="flex mb-8 relative">
-                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center z-10 shadow-lg border-4 border-white ml-2 md:ml-0">
-                    <i class="fas fa-bed"></i>
-                </div>
-                <div class="ml-6 bg-white p-5 rounded-lg shadow-sm border border-gray-100 flex-grow card">
-                    <div class="flex items-center mb-2">
-                        <span class="tag tag-hotel">住宿</span>
-                        <h3 class="text-lg font-bold text-gray-800">中部國際機場酒店 (Centrair Hotel)</h3>
-                    </div>
-                    <div class="text-gray-600 text-sm">
-                        <i class="fas fa-map-marker-alt text-red-400 mr-1"></i>
-                        愛知縣, Tokoname, Centrair 1-1, 日本
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
+    </nav>
 
     <script>
-        function switchDay(dayId) {
-            // 隱藏所有內容
-            document.getElementById('content-d7').classList.add('hidden');
-            document.getElementById('content-d8').classList.add('hidden');
-            
-            // 移除按鈕啟用狀態
-            document.getElementById('btn-d7').classList.remove('active', 'bg-blue-600', 'text-white', 'border-blue-600');
-            document.getElementById('btn-d8').classList.remove('active', 'bg-blue-600', 'text-white', 'border-blue-600');
-            
-            // 顯示選定內容
-            document.getElementById('content-' + dayId).classList.remove('hidden');
-            
-            // 設置按鈕狀態
-            document.getElementById('btn-' + dayId).classList.add('active');
+        // --- DATA ---
+        const tripData = {
+            flights: [
+                { type: '去程', date: '2026-02-06', code: 'CI 0154', route: 'TPE -> NGO', time: '07:35 - 11:05' },
+                { type: '回程', date: '2026-02-14', code: 'CI 0151', route: 'NGO -> TPE', time: '09:50 - 12:15' }
+            ],
+            itinerary: [
+                {
+                    day: 1, date: '2026-02-06', weekday: '週五',
+                    items: [
+                        { time: '03:00', title: '機場接送', note: '家裡 -> 桃園機場' },
+                        { time: '07:35', title: '起飛 (飛往名古屋)', note: 'CI 0154' },
+                        { time: '11:05', title: '抵達名古屋', note: '中部國際機場' },
+                        { time: '12:00', title: '取車 (AQ Relax-Rentacar)', note: '停留30分鐘', address: '〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一, 日本' },
+                        { time: '13:00', title: '午餐 (JR Gate Tower Mall)', note: '逛 Bic Camera，停留3小時。停車場：タワーズ一般駐車場 南口入口', address: '1 Chome-26-34 Meiekiminami, Nakamura Ward, Nagoya, Aichi 450-0003日本' },
+                        { time: '17:00', title: '住宿 Check-in', note: '鈴鹿賽道樂園酒店 (北棟賽車房)。含早晚餐、樂園護照x4、休息室卷', address: '鈴鹿サーキット駐車場 M2, 日本〒510-0201 Mie, Suzuka, Inoucho, 7992' },
+                        { time: '19:30', title: '晚餐', note: '鈴鹿賽道樂園酒店自助晚餐' }
+                    ]
+                },
+                {
+                    day: 2, date: '2026-02-07', weekday: '週六',
+                    items: [
+                        { time: '07:00', title: '早餐', note: '飯店自助早餐' },
+                        { time: '09:30', title: '鈴鹿賽車樂園', note: '拿中文地圖，掃描QRCode看排隊時間' },
+                        { time: '13:10', title: '鈴鹿賽道挑戰者', note: '停留40分鐘。乘車卷x3 (email)' },
+                        { time: '14:00', title: '午餐', note: '樂園內 GRAN VIEW 餐廰' },
+                        { time: '15:00', title: '繼續遊玩', note: '玩到 17:00' },
+                        { time: '18:00', title: '晚餐-拉麵 (萬來亭)', note: '停留1小時', address: 'Banraitei Parking Lot, 2 Chome Shiomigaoka, Midori Ward, Nagoya, Aichi 458-0037日本' },
+                        { time: '20:00', title: '住宿：Airbnb', address: '愛知縣名古屋市緑區鳴海町字作町26號' }
+                    ]
+                },
+                {
+                    day: 3, date: '2026-02-08', weekday: '週日',
+                    items: [
+                        { time: '07:00', title: '早餐 (超商)', note: '停留30分鐘。7-11或全家', address: '名古屋市緑区浦里5-203' },
+                        { time: '08:15', title: '吉卜力公園', note: '停北口停車場，玩到 13:00', address: '1533-1 Ibaragabasama, Nagakute, Aichi 480-1342日本' },
+                        { time: '16:00', title: '前往長野移動', note: '車程較長' },
+                        { time: '18:00', title: '晚餐與住宿', note: '池之平飯店', address: '1596 Ashidahakkano, Tateshina, Kitasaku District, Nagano 391-0321日本' }
+                    ]
+                },
+                {
+                    day: 4, date: '2026-02-09', weekday: '週一',
+                    items: [
+                        { time: '07:30', title: '早餐', note: '池之平飯店' },
+                        { time: '09:00', title: '白樺高原國際滑雪場', address: '743 Ashidahakkano, Tateshina, Kitasaku District, Nagano 384-2309日本' },
+                        { time: '17:00', title: '晚餐與住宿', note: '池之平飯店' }
+                    ]
+                },
+                {
+                    day: 5, date: '2026-02-10', weekday: '週二',
+                    items: [
+                        { time: '07:30', title: '早餐', note: '池之平飯店' },
+                        { time: '09:00', title: '白樺高原國際滑雪場', address: '743 Ashidahakkano, Tateshina, Kitasaku District, Nagano 384-2309日本' },
+                        { time: '17:00', title: '晚餐與住宿', note: '池之平飯店' }
+                    ]
+                },
+                {
+                    day: 6, date: '2026-02-11', weekday: '週三',
+                    items: [
+                        { time: '07:30', title: '早餐', note: '池之平飯店' },
+                        { time: '09:00', title: '車山高原滑雪場', address: '日本〒391-0301 Nagano, Chino, Kitayama, 車山3413' },
+                        { time: '17:00', title: '晚餐與住宿', note: '池之平飯店' }
+                    ]
+                },
+                {
+                    day: 7, date: '2026-02-12', weekday: '週四',
+                    items: [
+                        { time: '07:30', title: '早餐', note: '池之平飯店' },
+                        { time: '09:00', title: '中餐 & 車山高原滑雪場', address: '日本〒391-0301 Nagano, Chino, Kitayama, 車山3413' },
+                        { time: '18:00', title: '晚餐選項1: 矢場丼', note: 'AEON MALL NAGOYA DOME MAE', address: '4 Chome-102-3 Yadaminami, Higashi Ward, Nagoya, Aichi 461-0048日本' },
+                        { time: '18:00', title: '晚餐選項2: 熱田蓬萊軒', note: '二選一', address: '503 Godocho, Atsuta Ward, Nagoya, Aichi 456-0043日本' },
+                        { time: '20:00', title: '住宿：Airbnb', address: '1-chōme-43-6 Yutaka, Nagoya, Aichi 457-0863' }
+                    ]
+                },
+                {
+                    day: 8, date: '2026-02-13', weekday: '週五',
+                    items: [
+                        { time: '08:00', title: '早餐：客美多咖啡 忠次店', address: '日本〒457-0843 Aichi, Nagoya, Minami Ward, Chuji, 2 Chome−1−1' },
+                        { time: '10:00', title: '常滑招財貓通', note: '停常滑市陶瓷器會館停車場', address: '日本〒479-0836 Aichi, Tokoname, Sakaemachi, 3 Chome−8' },
+                        { time: '12:00', title: '中餐：丸葉食堂', note: '必點炸大蝦定食 (エビフライ定食)', address: '日本〒479-0882 Aichi, Tokoname, Rinkucho, 3 Chome−9-5' },
+                        { time: '14:00', title: 'AEON 常滑', address: '2 Chome-20-3 Rinkucho, Tokoname, Aichi 479-0882日本' },
+                        { time: '17:00', title: '還車 (AQ Relax-Rentacar)', address: '〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一, 日本' },
+                        { time: '17:30', title: '買伴手禮', note: '中部國際機場 (銘品館/4樓商店街)：坂角總本舖蝦餅、兩口屋是清、世界的山將' },
+                        { time: '19:00', title: '晚餐', note: '中部國際機場4樓：世界的山將 / まるや鰻魚飯 / 矢場味噌豬排' },
+                        { time: '21:00', title: '住宿：中部國際機場酒店', address: '愛知縣, Tokoname, Centrair 1-1, 日本' }
+                    ]
+                },
+                {
+                    day: 9, date: '2026-02-14', weekday: '週六',
+                    items: [
+                        { time: '09:50', title: '起飛 (回台灣)', note: 'CI 0151' },
+                        { time: '12:15', title: '抵達台灣', note: 'TPE' },
+                        { time: '13:00', title: '機場接送', note: '回家囉~' }
+                    ]
+                }
+            ],
+            guide: [
+                {
+                    title: 'JR Gate Tower Mall & Parking',
+                    content: `
+                        <p class="font-bold mb-2">1.1 停車場入口 (タワーズ一般駐車場 南口入口)</p>
+                        <p class="text-sm mb-2 text-gray-600">導航輸入電話 052-586-7811 最保險。</p>
+                        <div class="space-y-2 mb-4">
+                            <img src="https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-1.png" class="w-full rounded shadow">
+                            <img src="https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-2.png" class="w-full rounded shadow">
+                        </div>
+                        <p class="font-bold mb-2">1.2 Bic Camera 消費折抵</p>
+                        <ul class="list-disc pl-5 text-sm mb-2">
+                            <li>位置：9F & 10F</li>
+                            <li>滿 5,000日圓：折抵 1小時</li>
+                            <li>滿 20,000日圓：折抵 2小時</li>
+                            <li>滿 50,000日圓：折抵 3小時</li>
+                        </ul>
+                    `
+                },
+                {
+                    title: '鈴鹿賽道樂園酒店',
+                    content: `
+                        <p class="font-bold mb-2">2.1 住宿者專用停車場</p>
+                        <p class="text-sm mb-2">櫃台位於主棟。即使住North/West棟，也先去主棟Check-in。</p>
+                        <img src="https://github.com/LulumeQQ/NGO-202602/raw/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-1.png" class="w-full rounded shadow mb-2">
+                        <a href="https://d-reserve.jp/auth/realms/M000000678/protocol/openid-connect/auth?response_type=code&client_id=directin-s4" target="_blank" class="block bg-blue-100 text-blue-700 p-2 rounded text-center text-sm font-bold mt-2"><i class="fas fa-link"></i> 飯店登入網址</a>
+                    `
+                },
+                {
+                    title: '吉卜力公園攻略',
+                    content: `
+                        <p class="font-bold text-cat-orange mb-2">週日半日・逆向攻略 (08:15 - 13:00)</p>
+                        <img src="https://github.com/LulumeQQ/NGO-202602/raw/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E6%94%BB%E7%95%A5.png" class="w-full rounded shadow mb-4">
+                        <div class="text-sm space-y-3">
+                            <div>
+                                <span class="bg-cat-orange text-white px-1 rounded text-xs">08:15</span> <strong>搶購 APM 貓巴士票</strong><br>
+                                地點：魔法公主之里旁自動售票機。買 09:00 前往「咚咚吭之森」的票。
+                            </div>
+                            <div>
+                                <span class="bg-cat-orange text-white px-1 rounded text-xs">09:15</span> <strong>咚咚吭之森 (小梅家)</strong><br>
+                                領手環，參觀廚房浴室。爬山看大龍貓。
+                            </div>
+                            <div>
+                                <span class="bg-cat-orange text-white px-1 rounded text-xs">10:35</span> <strong>魔女之谷 (必去!)</strong><br>
+                                順序：霍爾城堡(1F/2F) -> 歐其諾大宅(琪琪家) -> 麵包店(人多就Pass) -> 魔女之家。
+                            </div>
+                            <div class="bg-red-50 p-2 rounded text-red-700 text-xs">
+                                ⚠️ 建築內部通常禁止拍照！只能拍外觀。Premium手環要隨身攜帶。
+                            </div>
+                        </div>
+                    `
+                }
+            ],
+            packingList: [
+                { category: '旅遊行李', items: ['護照x4', '外幣/信用卡', 'E-SIM', '日文譯本駕照', '發熱衣褲x4', '換洗衣物', '盥洗用品', '各種充電線', '備用藥品', '尿布/濕紙巾'] },
+                { category: '滑雪裝備', items: ['雪衣褲x4', '排汗衣x4', '中層保暖x4', '雪鏡/面罩x4', '毛帽/手套x4', '防摔褲x4', '護膝護肘', '雪襪x4'] }
+            ]
+        };
 
-            // 滾動到頁面頂部
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
+        // --- GLOBAL STATE ---
+        let currentView = 'plan';
+        let currentDay = 1;
+        
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            router('plan');
+            loadSelectedItems();
+        });
+
+        // --- ROUTER ---
+        function router(view) {
+            currentView = view;
+            
+            // Update Nav UI
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'text-cat-orange'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.add('text-gray-400'));
+            const activeBtn = document.getElementById(`nav-${view}`);
+            activeBtn.classList.add('active', 'text-cat-orange');
+            activeBtn.classList.remove('text-gray-400');
+
+            const container = document.getElementById('app-container');
+            container.innerHTML = '';
+
+            // Render View
+            if (view === 'plan') renderPlan(container);
+            if (view === 'guide') renderGuide(container);
+            if (view === 'wallet') renderWallet(container);
+            if (view === 'lists') renderLists(container);
+            if (view === 'info') renderInfo(container);
+            
+            window.scrollTo(0, 0);
+        }
+
+        // --- VIEW: PLAN ---
+        function renderPlan(container) {
+            // Day Selector
+            let dayTabs = `<div class="flex overflow-x-auto gap-2 py-4 mb-2 hide-scrollbar sticky top-16 bg-bg-paper z-40">`;
+            tripData.itinerary.forEach(d => {
+                const isActive = d.day === currentDay ? 'bg-cat-orange text-white shadow-md' : 'bg-white text-gray-500 border border-gray-200';
+                dayTabs += `
+                    <button onclick="switchDay(${d.day})" class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-colors ${isActive}">
+                        D${d.day} <span class="text-xs font-normal ml-1">${d.weekday}</span>
+                    </button>`;
+            });
+            dayTabs += `</div>`;
+
+            // Timeline Items
+            const dayData = tripData.itinerary.find(d => d.day === currentDay);
+            let itemsHtml = `<div class="relative pl-4 pb-12 animate-fade-in">
+                <div class="timeline-line"></div>`;
+
+            dayData.items.forEach((item, index) => {
+                // Check selection state from LocalStorage
+                const isSelected = isItemSelected(currentDay, index);
+                const selectedClass = isSelected ? 'selected' : '';
+                
+                let addressBtn = '';
+                if (item.address) {
+                    addressBtn = `
+                        <div class="mt-3 flex gap-2">
+                            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address)}" target="_blank" class="flex-1 bg-green-50 text-green-700 py-1.5 px-3 rounded text-xs font-bold flex items-center justify-center gap-1 active:scale-95 transition-transform" onclick="event.stopPropagation()">
+                                <i class="fas fa-map-marker-alt"></i> 地圖
+                            </a>
+                            <button onclick="copyText('${item.address}'); event.stopPropagation()" class="bg-gray-100 text-gray-600 py-1.5 px-3 rounded text-xs active:bg-gray-200" title="複製地址">
+                                <i class="far fa-copy"></i>
+                            </button>
+                        </div>`;
+                }
+
+                itemsHtml += `
+                    <div class="relative mb-6 pl-8" onclick="toggleSelection(${currentDay}, ${index})">
+                        <div class="timeline-dot absolute left-0 top-4 w-4 h-4 bg-white border-4 border-gray-300 rounded-full z-10 transition-colors"></div>
+                        <div class="plan-card bg-white p-4 rounded-xl shadow-sm relative overflow-hidden ${selectedClass}" id="card-${currentDay}-${index}">
+                            <i class="fas fa-paw text-cat-orange absolute top-2 right-2 text-2xl transform rotate-12 paw-icon"></i>
+                            <div class="text-cat-orange font-bold text-lg leading-none mb-1">${item.time}</div>
+                            <h3 class="font-bold text-gray-800 text-lg">${item.title}</h3>
+                            ${item.note ? `<p class="text-sm text-gray-500 mt-1">${item.note}</p>` : ''}
+                            ${addressBtn}
+                        </div>
+                    </div>
+                `;
+            });
+            itemsHtml += `</div>`;
+
+            container.innerHTML = `
+                <div class="text-center text-sm text-gray-400 mb-2">${dayData.date}</div>
+                ${dayTabs}
+                ${itemsHtml}
+            `;
+        }
+
+        function switchDay(day) {
+            currentDay = day;
+            router('plan');
+        }
+
+        // --- VIEW: GUIDE ---
+        function renderGuide(container) {
+            let html = `<div class="space-y-4 pt-4 animate-fade-in">`;
+            tripData.guide.forEach((g, idx) => {
+                html += `
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <button onclick="toggleGuide('guide-${idx}')" class="w-full flex justify-between items-center p-4 bg-white hover:bg-orange-50 transition-colors">
+                            <span class="font-bold text-lg text-gray-800 border-l-4 border-cat-orange pl-3">${g.title}</span>
+                            <i class="fas fa-chevron-down text-gray-400 transition-transform" id="icon-guide-${idx}"></i>
+                        </button>
+                        <div id="guide-${idx}" class="hidden p-4 border-t border-gray-100 bg-gray-50 text-gray-700">
+                            ${g.content}
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function toggleGuide(id) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            el.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+
+        // --- VIEW: WALLET ---
+        function renderWallet(container) {
+            const savedExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+            
+            container.innerHTML = `
+                <div class="space-y-6 pt-4 animate-fade-in">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-orange-100">
+                        <label class="text-xs text-gray-400 uppercase font-bold tracking-wider">匯率換算 (0.22)</label>
+                        <div class="flex items-end gap-2 mt-2">
+                            <div class="flex-1">
+                                <input type="text" id="calc-input" placeholder="輸入算式如 500+200" class="w-full text-2xl font-bold text-gray-800 border-b-2 border-orange-200 focus:border-cat-orange outline-none bg-transparent placeholder-gray-300" onkeydown="if(event.key==='Enter') calculate()">
+                            </div>
+                            <span class="text-xl text-gray-400">=</span>
+                            <div class="text-right">
+                                <div class="text-xs text-gray-400">TWD</div>
+                                <div id="calc-result" class="text-2xl font-bold text-cat-orange">0</div>
+                            </div>
+                        </div>
+                        <button onclick="calculate()" class="w-full mt-3 bg-orange-50 text-cat-orange py-2 rounded-lg font-bold text-sm">計算</button>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-sm">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fas fa-receipt text-cat-orange"></i> 新增記帳</h3>
+                        <div class="space-y-3">
+                            <input type="text" id="exp-name" placeholder="品項名稱" class="w-full p-3 rounded-lg bg-gray-50 border-none outline-none">
+                            <input type="number" id="exp-amount" placeholder="日幣金額" class="w-full p-3 rounded-lg bg-gray-50 border-none outline-none">
+                            
+                            <label class="block w-full p-3 rounded-lg bg-gray-50 text-gray-400 text-center cursor-pointer border-2 border-dashed border-gray-200 hover:bg-gray-100 relative">
+                                <input type="file" id="exp-photo" accept="image/*" class="hidden" onchange="previewImage(this)">
+                                <span id="photo-label"><i class="fas fa-camera mr-2"></i> 上傳照片 (選填)</span>
+                                <img id="photo-preview" class="hidden w-full h-32 object-cover rounded mt-2">
+                            </label>
+
+                            <button onclick="addExpense()" class="w-full bg-cat-orange text-white py-3 rounded-xl font-bold shadow-lg shadow-orange-200 active:scale-95 transition-transform">
+                                儲存這筆紀錄
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pb-8">
+                        <h3 class="font-bold text-gray-800 mb-2 px-2">消費紀錄</h3>
+                        <div id="expense-list" class="space-y-3">
+                            ${renderExpenseList(savedExpenses)}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- VIEW: LISTS ---
+        function renderLists(container) {
+            let packingHtml = `<div class="grid grid-cols-2 gap-3 mb-6">`;
+            tripData.packingList.forEach((cat, catIdx) => {
+                packingHtml += `<div class="bg-white p-4 rounded-xl shadow-sm col-span-2">
+                    <h3 class="font-bold text-cat-orange mb-3 border-b pb-2">${cat.category}</h3>
+                    <div class="grid grid-cols-2 gap-2">`;
+                cat.items.forEach((item, itemIdx) => {
+                    const id = `pack-${catIdx}-${itemIdx}`;
+                    const isChecked = localStorage.getItem(id) === 'true' ? 'checked' : '';
+                    packingHtml += `
+                        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+                            <input type="checkbox" id="${id}" ${isChecked} onchange="toggleCheck('${id}')" class="accent-cat-orange w-4 h-4 rounded">
+                            <span class="${isChecked ? 'line-through text-gray-400' : ''}">${item}</span>
+                        </label>
+                    `;
+                });
+                packingHtml += `</div></div>`;
+            });
+            packingHtml += `</div>`;
+
+            const memoText = localStorage.getItem('tripMemo') || '';
+            
+            container.innerHTML = `
+                <div class="pt-4 animate-fade-in">
+                    ${packingHtml}
+
+                    <div class="bg-white p-4 rounded-xl shadow-sm">
+                        <h3 class="font-bold text-gray-800 mb-2"><i class="fas fa-pen-fancy text-cat-orange mr-1"></i> 個人備忘錄</h3>
+                        <textarea id="memo-area" class="w-full h-40 p-3 rounded-lg bg-yellow-50 text-gray-700 leading-relaxed outline-none resize-none border-none" placeholder="輸入筆記，網址會自動變成按鈕..." oninput="saveMemo(this.value)">${memoText}</textarea>
+                        <div id="memo-links" class="mt-2 flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+            `;
+            // Initial render of links
+            setTimeout(() => parseMemoLinks(memoText), 100);
+        }
+
+        // --- VIEW: INFO ---
+        function renderInfo(container) {
+            container.innerHTML = `
+                <div class="space-y-4 pt-4 animate-fade-in">
+                    <div class="grid grid-cols-2 gap-4">
+                        <a href="https://www.jma.go.jp/bosai/forecast/" target="_blank" class="bg-blue-500 text-white p-6 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
+                            <i class="fas fa-cloud-sun text-3xl"></i>
+                            <span class="font-bold">天氣預報</span>
+                        </a>
+                        <a href="tel:110" class="bg-red-500 text-white p-6 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
+                            <i class="fas fa-user-shield text-3xl"></i>
+                            <span class="font-bold">報警 110</span>
+                        </a>
+                        <a href="tel:119" class="bg-orange-500 text-white p-6 rounded-2xl shadow-lg flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
+                            <i class="fas fa-ambulance text-3xl"></i>
+                            <span class="font-bold">救護 119</span>
+                        </a>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm flex flex-col items-center justify-center gap-2 text-gray-600">
+                            <i class="fas fa-passport text-3xl text-cat-orange"></i>
+                            <span class="font-bold text-sm">護照號碼</span>
+                            <span class="text-xs">請見清單照片</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-xl shadow-sm">
+                        <h3 class="font-bold text-gray-800 mb-2">航班資訊</h3>
+                        ${tripData.flights.map(f => `
+                            <div class="mb-3 border-b last:border-0 pb-2">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="badge bg-cat-light text-cat-orange px-2 py-0.5 rounded text-xs font-bold">${f.type}</span>
+                                    <span class="text-xs text-gray-400">${f.date}</span>
+                                </div>
+                                <div class="font-bold text-lg">${f.code}</div>
+                                <div class="text-sm text-gray-600">${f.route}</div>
+                                <div class="text-sm font-mono">${f.time}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- LOGIC: PLAN INTERACTION ---
+        function isItemSelected(day, index) {
+            const selected = JSON.parse(localStorage.getItem('selectedItems') || '{}');
+            return selected[day] === index;
+        }
+
+        function toggleSelection(day, index) {
+            let selected = JSON.parse(localStorage.getItem('selectedItems') || '{}');
+            
+            // If already selected, deselect. Else, select (and replace old selection for that day)
+            if (selected[day] === index) {
+                delete selected[day];
+            } else {
+                selected[day] = index;
+            }
+            
+            localStorage.setItem('selectedItems', JSON.stringify(selected));
+            renderPlan(document.getElementById('app-container'));
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('地址已複製！');
             });
         }
+
+        // --- LOGIC: WALLET ---
+        function calculate() {
+            const input = document.getElementById('calc-input').value;
+            if (!input) return;
+            try {
+                // Safe eval for math
+                const jpy = Function('"use strict";return (' + input + ')')();
+                const twd = Math.round(jpy * 0.22);
+                document.getElementById('calc-result').innerText = twd.toLocaleString();
+                // Update input field to show total JPY result
+                document.getElementById('calc-input').value = jpy;
+            } catch (e) {
+                alert('算式錯誤');
+            }
+        }
+
+        let tempImageBase64 = null;
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        // Compress image using Canvas
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const maxWidth = 400; // Resize to max 400px width
+                        const scale = maxWidth / img.width;
+                        canvas.width = maxWidth;
+                        canvas.height = img.height * scale;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        tempImageBase64 = canvas.toDataURL('image/jpeg', 0.6); // 60% quality
+                        
+                        document.getElementById('photo-preview').src = tempImageBase64;
+                        document.getElementById('photo-preview').classList.remove('hidden');
+                        document.getElementById('photo-label').classList.add('hidden');
+                    };
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function addExpense() {
+            const name = document.getElementById('exp-name').value;
+            const amount = document.getElementById('exp-amount').value;
+            if (!name || !amount) {
+                alert('請輸入名稱與金額');
+                return;
+            }
+
+            const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+            expenses.unshift({
+                id: Date.now(),
+                name,
+                amount: parseInt(amount),
+                date: new Date().toLocaleDateString(),
+                img: tempImageBase64
+            });
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            
+            // Reset form
+            document.getElementById('exp-name').value = '';
+            document.getElementById('exp-amount').value = '';
+            tempImageBase64 = null;
+            document.getElementById('photo-preview').classList.add('hidden');
+            document.getElementById('photo-label').classList.remove('hidden');
+            
+            // Re-render list
+            document.getElementById('expense-list').innerHTML = renderExpenseList(expenses);
+        }
+
+        function renderExpenseList(expenses) {
+            if (expenses.length === 0) return '<div class="text-center text-gray-400 py-4">尚無紀錄</div>';
+            return expenses.map(e => `
+                <div class="bg-white p-3 rounded-xl shadow-sm flex items-center gap-3">
+                    ${e.img ? `<img src="${e.img}" class="w-12 h-12 rounded object-cover border border-gray-100">` : `<div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center text-gray-300"><i class="fas fa-shopping-bag"></i></div>`}
+                    <div class="flex-1">
+                        <div class="font-bold text-gray-800">${e.name}</div>
+                        <div class="text-xs text-gray-400">${e.date}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-gray-800">¥${e.amount}</div>
+                        <div class="text-xs text-cat-orange">NT$${Math.round(e.amount * 0.22)}</div>
+                    </div>
+                    <button onclick="deleteExpense(${e.id})" class="text-gray-300 px-2"><i class="fas fa-times"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function deleteExpense(id) {
+            if(!confirm('確定刪除？')) return;
+            let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+            expenses = expenses.filter(e => e.id !== id);
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            document.getElementById('expense-list').innerHTML = renderExpenseList(expenses);
+        }
+
+        // --- LOGIC: LISTS ---
+        function toggleCheck(id) {
+            const checkbox = document.getElementById(id);
+            localStorage.setItem(id, checkbox.checked);
+            
+            // Visual feedback (line-through)
+            const span = checkbox.nextElementSibling;
+            if (checkbox.checked) {
+                span.classList.add('line-through', 'text-gray-400');
+            } else {
+                span.classList.remove('line-through', 'text-gray-400');
+            }
+        }
+
+        function saveMemo(text) {
+            localStorage.setItem('tripMemo', text);
+            parseMemoLinks(text);
+        }
+
+        function parseMemoLinks(text) {
+            const container = document.getElementById('memo-links');
+            if(!container) return;
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const matches = text.match(urlRegex);
+            
+            if (matches) {
+                container.innerHTML = matches.map((url, idx) => `
+                    <a href="${url}" target="_blank" class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs truncate max-w-full block mb-1">
+                        <i class="fas fa-link mr-1"></i> 連結 ${idx + 1}
+                    </a>
+                `).join('');
+            } else {
+                container.innerHTML = '';
+            }
+        }
+
     </script>
 </body>
 </html>
