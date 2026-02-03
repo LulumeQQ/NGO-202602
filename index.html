@@ -5,18 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>名古屋滑雪之旅 🐱</title>
     
-    <!-- Fonts: Zen Maru Gothic (圓體) & Noto Sans TC -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Config -->
     <script>
         tailwind.config = {
             theme: {
@@ -181,7 +177,6 @@
 </head>
 <body class="flex flex-col h-screen overflow-hidden text-sm">
 
-    <!-- Header -->
     <header class="bg-card-white shadow-sm px-5 py-4 z-20 flex justify-between items-center relative shrink-0">
         <div>
             <h1 class="text-lg font-black text-muji-text tracking-wide flex items-center gap-2">
@@ -195,12 +190,9 @@
         </div>
     </header>
 
-    <!-- Content Area -->
     <main id="app-content" class="flex-1 overflow-y-auto no-scrollbar pb-24 relative bg-muji-bg scroll-smooth">
-        <!-- Javascript will inject content here -->
-    </main>
+        </main>
 
-    <!-- Bottom Navigation -->
     <nav class="bg-card-white/95 backdrop-blur-md border-t border-gray-100 fixed bottom-0 w-full pb-safe z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <div class="flex justify-around items-center h-16 max-w-md mx-auto">
             <button onclick="router('plan')" class="nav-btn group flex flex-col items-center w-full" id="btn-plan">
@@ -226,15 +218,12 @@
         </div>
     </nav>
 
-    <!-- Fullscreen Image Modal -->
     <div id="img-modal" class="fixed inset-0 bg-black/95 hidden z-50 flex justify-center items-center p-2 backdrop-blur-sm" onclick="this.classList.add('hidden')">
         <img id="img-modal-src" src="" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl object-contain">
     </div>
     
-    <!-- Toast Notification -->
     <div id="toast" class="toast">地址已複製</div>
 
-    <!-- JAVASCRIPT -->
     <script>
         // --- Data Configuration ---
         const tripData = {
@@ -259,7 +248,7 @@
                     { time: '03:00', title: '機場接送', desc: '家裡 -> 桃園機場', type: 'transport', highlight: true },
                     { time: '07:35', title: '起飛 CI 0154', desc: '飛往名古屋', type: 'flight' },
                     { time: '11:05', title: '抵達名古屋', desc: '中部國際機場', type: 'arrival' },
-                    { time: '12:00', title: '取車', desc: '停留：30分鐘', type: 'car', addr: '〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一, 日本' },
+                    { time: '12:00', title: '取車 (AQ Relax)', desc: '停留：30分鐘\n〒479-0881 Aichi, Tokoname', type: 'car', addr: '〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一, 日本' },
                     { time: '13:30', title: 'JR Gate Tower Mall', desc: '停留：3小時\n停車：タワーズ一般駐車場 南口入口', type: 'shop', addr: '1 Chome-26-34 Meiekiminami, Nakamura Ward, Nagoya, Aichi 450-0003日本' },
                     { time: '18:00', title: '住宿：鈴鹿賽道樂園酒店', desc: '北棟賽車房 | 含早晚餐\n含4張樂園護照與賽道貴休息室卷', type: 'hotel', addr: '鈴鹿サーキット駐車場 M2, 日本〒510-0201 Mie, Suzuka, Inoucho, 7992' },
                     { time: '19:30', title: '晚餐', desc: '飯店自助晚餐', type: 'food' }
@@ -278,35 +267,37 @@
                     { time: '', title: '7-11 名古屋藥師山', desc: '第二站', type: 'shop', addr: '名古屋市緑区鳴海町字薬師山179-1' },
                     { time: '', title: 'FamilyMart 潮見之丘', desc: '第三站', type: 'shop', addr: '名古屋市緑区潮見が丘1-79' },
                     { time: '08:00', title: '吉卜力公園北口停車場', desc: '玩到 13:00', type: 'car', addr: '1533-1 Ibaragabasama, Nagakute, Aichi 480-1342日本' },
-                    { time: '16:00', title: '住宿：池之平飯店', desc: '晚餐與住宿', type: 'hotel', addr: 'Ikenotaira Shirakabakogen hotels, 750 Ashidahakkano, Tateshina, Kitasaku District, Nagano 384-2309日本' }
+                    { time: '16:00', title: '晚餐與住宿：池之平飯店', desc: '長野縣', type: 'hotel', addr: '1596 Ashidahakkano, Tateshina, Kitasaku District, Nagano 391-0321日本' }
                 ],
                 d4: [
                     { time: '07:30', title: '早餐', desc: '池之平飯店', type: 'food' },
                     { time: '09:00', title: '白樺高原國際滑雪場', desc: '全日滑雪', type: 'person-skiing', highlight: true, addr: '743 Ashidahakkano, Tateshina, Kitasaku District, Nagano 384-2309日本' },
-                    { time: '17:00', title: '池之平飯店', desc: '晚餐與住宿', type: 'hotel', addr: 'Ikenotaira Shirakabakogen hotels, 750 Ashidahakkano, Tateshina, Kitasaku District, Nagano 384-2309日本' }
+                    { time: '17:00', title: '池之平飯店', desc: '晚餐與住宿', type: 'hotel', addr: '1596 Ashidahakkano, Tateshina, Kitasaku District, Nagano 391-0321日本' }
                 ],
                 d5: [
                     { time: '07:30', title: '早餐', desc: '池之平飯店', type: 'food' },
                     { time: '09:00', title: '白樺高原國際滑雪場', desc: '全日滑雪', type: 'person-skiing', highlight: true, addr: '743 Ashidahakkano, Tateshina, Kitasaku District, Nagano 384-2309日本' },
-                    { time: '17:00', title: '池之平飯店', desc: '晚餐與住宿', type: 'hotel', addr: 'Ikenotaira Shirakabakogen hotels, 750 Ashidahakkano, Tateshina, Kitasaku District, Nagano 384-2309日本' }
+                    { time: '17:00', title: '池之平飯店', desc: '晚餐與住宿', type: 'hotel', addr: '1596 Ashidahakkano, Tateshina, Kitasaku District, Nagano 391-0321日本' }
                 ],
                 d6: [
                     { time: '07:30', title: '早餐', desc: '池之平飯店', type: 'food' },
                     { time: '09:00', title: '車山高原滑雪場', desc: '全日滑雪', type: 'person-skiing', highlight: true, addr: '日本〒391-0301 Nagano, Chino, Kitayama, 車山3413' },
-                    { time: '17:00', title: '池之平飯店', desc: '晚餐與住宿', type: 'hotel', addr: 'Ikenotaira Shirakabakogen hotels, 750 Ashidahakkano, Tateshina, Kitasaku District, Nagano 384-2309日本' }
+                    { time: '17:00', title: '池之平飯店', desc: '晚餐與住宿', type: 'hotel', addr: '1596 Ashidahakkano, Tateshina, Kitasaku District, Nagano 391-0321日本' }
                 ],
                 d7: [
                     { time: '07:30', title: '早餐', desc: '池之平飯店', type: 'food' },
-                    { time: '09:00', title: '車山高原滑雪場', desc: '半日滑雪', type: 'person-skiing', addr: '日本〒391-0301 Nagano, Chino, Kitayama, 車山3413' },
-                    { time: '12:00', title: '中餐', desc: '自理', type: 'food' },
-                    { time: '18:00', title: '晚餐', desc: '自理', type: 'food' },
+                    { time: '09:00', title: '車山高原滑雪場', desc: '半日滑雪 & 中餐', type: 'person-skiing', addr: '日本〒391-0301 Nagano, Chino, Kitayama, 車山3413' },
+                    { time: '17:00', title: '晚餐：矢場丼 / 熱田蓬萊軒', desc: 'AEON MALL Nagoya Dome', type: 'food', addr: 'AEON MALL NAGOYA DOME MAE, 4 Chome-102-3 Yadaminami, Higashi Ward, Nagoya, Aichi 461-0048日本' },
                     { time: '20:00', title: '住宿：Airbnb', desc: '名古屋市區', type: 'hotel', addr: '1-chōme-43-6 Yutaka, Nagoya, Aichi 457-0863' }
                 ],
                 d8: [
-                    { time: '08:00', title: '早餐', desc: '自理', type: 'food' },
-                    { time: '12:00', title: '中餐', desc: '自理', type: 'food' },
-                    { time: '16:00', title: '還車', desc: '中部國際機場', type: 'car' },
-                    { time: '17:00', title: '住宿：中部國際機場酒店', desc: '晚餐自理', type: 'hotel', addr: '愛知縣, Tokoname, Centrair 1-1, 日本' }
+                    { time: '08:00', title: '早餐：客美多咖啡 忠次店', desc: '名古屋式早餐', type: 'food', addr: '日本〒457-0843 Aichi, Nagoya, Minami Ward, Chuji, 2 Chome−1−1' },
+                    { time: '10:00', title: '常滑招財貓通', desc: '常滑市陶瓷器會館停車場', type: 'play', addr: '日本〒479-0836 Aichi, Tokoname, Sakaemachi, 3 Chome−8' },
+                    { time: '12:00', title: '中餐：丸葉食堂', desc: '必點炸大蝦定食', type: 'food', addr: '日本〒479-0882 Aichi, Tokoname, Rinkucho, 3 Chome−9-5' },
+                    { time: '14:00', title: 'AEON 常滑', desc: '購物', type: 'shop', addr: '2 Chome-20-3 Rinkucho, Tokoname, Aichi 479-0882日本' },
+                    { time: '17:00', title: '還車 (AQ Relax)', desc: '中部國際機場', type: 'car', addr: '〒479-0881 Aichi, Tokoname, Centrair, 1-chōme−1 1 第一, 日本' },
+                    { time: '18:00', title: '買伴手禮 & 晚餐', desc: 'T1 3F銘品館 / 4F餐廳\n世界的山將、鰻魚飯、矢場豬排', type: 'shop' },
+                    { time: '20:00', title: '住宿：中部國際機場酒店', desc: 'T1 旁', type: 'hotel', addr: '愛知縣, Tokoname, Centrair 1-1, 日本' }
                 ],
                 d9: [
                     { time: '09:50', title: '起飛', desc: 'CI 0151', type: 'flight' },
@@ -314,7 +305,13 @@
                     { time: '13:00', title: '機場接送', desc: '回家囉~', type: 'car', highlight: true }
                 ]
             },
-            checklist: ['護照', '網卡/漫遊', '日幣現金', '信用卡', '駕照日文譯本', '行動電源', '保暖衣物', '個人藥品', 'Hotmail 乘車卷']
+            checklist: [
+                '護照x4', '外幣', 'E-SIM', '台灣駕照+日文譯本', '信用卡',
+                '發熱衣褲x4', '衣服x3x4', '褲子x2x4', '內衣褲x8', '襪子x6', '背心x3', '圍巾',
+                '洗面乳/卸妝/保養品', '防晒/護唇膏', '牙刷牙膏', '泳衣/帽/鏡/巾x4', '折疊衣架',
+                '尿布/衛生棉/濕紙巾', '充電線材/Hub/幫浦', '備用藥/指甲刀/口罩',
+                '雪衣褲x4', '排汗衣褲x4', '中層保暖x4', '雪鏡/面罩/毛帽x4', '防摔褲x4', '護膝/肘/雪襪/手套'
+            ]
         };
 
         // --- State Management ---
@@ -421,14 +418,12 @@
 
                 return `
                 <div class="flex gap-4 group" onclick="toggleSelection('${uniqueId}')">
-                    <!-- Left: Time & Line -->
                     <div class="flex flex-col items-center min-w-[3rem] pt-2">
                         <span class="text-xs font-bold font-mono text-gray-500 mb-1">${item.time || '--:--'}</span>
                         <div class="w-3.5 h-3.5 rounded-full bg-gray-200 border-2 border-white shadow-sm z-10 timeline-dot" id="dot-${uniqueId}"></div>
                         ${index !== tripData.itinerary[day].length - 1 ? '<div class="w-0.5 flex-1 bg-gray-200 my-1"></div>' : ''}
                     </div>
                     
-                    <!-- Right: Card -->
                     <div class="flex-1 pb-4">
                         <div id="card-${uniqueId}" class="trip-card bg-white p-4 rounded-2xl shadow-soft relative">
                             <div class="flex justify-between items-start">
@@ -439,7 +434,6 @@
                                 <i class="fa-solid ${iconClass} ${highlightClass} opacity-20 text-2xl absolute top-3 right-3"></i>
                             </div>
                             ${mapBtn}
-                            <!-- Paw Stamp -->
                             <i class="fa-solid fa-paw paw-stamp"></i>
                         </div>
                     </div>
@@ -478,27 +472,28 @@
 
         // --- 2. GUIDE MODULE ---
         function renderGuide(container) {
+            // Replaced blob with raw for images
             const parkingImages = [
-                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-1.png",
-                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-2.png",
-                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-3.png",
-                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-4.png"
+                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-1.png",
+                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-2.png",
+                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-3.png",
+                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-4.png"
             ];
             
             const suzukaImages = [
-                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-1.png",
-                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-2.png",
-                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-3.png"
+                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-1.png",
+                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-2.png",
+                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-3.png"
             ];
 
-            const ghibliParkingImg = "https://github.com/LulumeQQ/NGO-202602/raw/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%8C%971%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3.png";
+            const ghibliParkingImg = "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%8C%971%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3.png";
             
             const ghibliApmImages = [
-                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%8C%971%E5%81%9C%E8%BB%8A%E5%A0%B4-APM%E8%B3%BC%E7%A5%A8%E8%99%95.jpg",
-                "https://github.com/LulumeQQ/NGO-202602/raw/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%8C%971%E5%81%9C%E8%BB%8A%E5%A0%B4-APM%E8%B3%BC%E7%A5%A8%E8%99%952.jpg"
+                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%8C%971%E5%81%9C%E8%BB%8A%E5%A0%B4-APM%E8%B3%BC%E7%A5%A8%E8%99%95.jpg",
+                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%8C%971%E5%81%9C%E8%BB%8A%E5%A0%B4-APM%E8%B3%BC%E7%A5%A8%E8%99%952.jpg"
             ];
             
-            const ghibliStrategyImg = "https://github.com/LulumeQQ/NGO-202602/raw/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E6%94%BB%E7%95%A5.png";
+            const ghibliStrategyImg = "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E6%94%BB%E7%95%A5.png";
 
             const loginUrl = "https://d-reserve.jp/auth/realms/M000000678/protocol/openid-connect/auth?response_type=code&client_id=directin-s4&redirect_uri=https%3A%2F%2Fd-reserve.jp%2Fguest-reserve-front%2Fsso%2Flogin?hotelCode%3D0000001590%26return_url%3Dhttps%253A%252F%252Fd-reserve.jp%252Fauth%252Frealms%252Fdirectin-s4%252Fcdp%252Fgroups%252FM000000678%252Fredirects%252Faccount%253Freferrer_uri%253Dhttps%25253A%25252F%25252Fd-reserve.jp%25252FGSEA001F01300%25252FGSEA001A01%25253FhotelCode%25253D0000001590%252526lang%25253Den&state=faadacc5-08c9-485f-972f-9681fbea58dd&login=true&ui_locales=en&scope=openid";
 
@@ -530,7 +525,7 @@
             const jrContent = `
                 <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
                      <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
-                        <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>停車場入口 (一般/南口)
+                        <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>停車場入口 (一般/南口) 
                     </h3>
                     <div class="scroll-gallery no-scrollbar">
                         ${parkingImages.map((img, i) => `
@@ -540,12 +535,12 @@
                             </div>
                         `).join('')}
                     </div>
-                    <div class="text-center text-[10px] text-gray-400 mt-2"><i class="fa-solid fa-left-right mr-1"></i>左右滑動查看</div>
+                    <div class="text-center text-[10px] text-gray-400 mt-2"><i class="fa-solid fa-left-right mr-1"></i>左右滑動查看示意圖</div>
                 </div>
                 <div class="space-y-6">
                     <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-sm leading-relaxed">
                         <p class="font-bold text-cat-orange mb-1">タワーズ一般駐車場 南口入口</p>
-                        <p class="text-gray-600 mb-2 text-xs">建議直接輸入電話導航：</p>
+                        <p class="text-gray-600 mb-2 text-xs">建議直接在導航輸入下方電話，這是最保險的方式。</p>
                         <a href="tel:0525867811" class="flex items-center justify-center bg-white border border-orange-200 text-cat-orange font-mono font-bold py-2 rounded-lg shadow-sm active:scale-95 transition-transform">
                             <i class="fa-solid fa-phone mr-2"></i> 052-586-7811
                         </a>
@@ -572,7 +567,7 @@
             const suzukaContent = `
                 <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
                      <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
-                        <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>住宿者專用停車場
+                        <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>住宿者專用停車場 
                     </h3>
                     <div class="scroll-gallery no-scrollbar">
                         ${suzukaImages.map((img, i) => `
@@ -597,7 +592,7 @@
 
             const ghibliContent = `
                 <div class="mb-8">
-                     <h3 class="font-bold text-lg text-muji-text mb-3 border-l-4 border-cat-orange pl-3">1. 北口停車場 & APM</h3>
+                     <h3 class="font-bold text-lg text-muji-text mb-3 border-l-4 border-cat-orange pl-3">1. 北口停車場 & APM </h3>
                      <div class="grid grid-cols-2 gap-2 mb-2">
                         <div class="scroll-item h-28 w-full"><img src="${ghibliParkingImg}" class="w-full h-full object-cover" onclick="showFullImage('${ghibliParkingImg}')"></div>
                         <div class="scroll-item h-28 w-full"><img src="${ghibliApmImages[0]}" class="w-full h-full object-cover" onclick="showFullImage('${ghibliApmImages[0]}')"></div>
@@ -608,7 +603,7 @@
                      </div>
                 </div>
                  <div class="mb-8">
-                     <h3 class="font-bold text-lg text-muji-text mb-3 border-l-4 border-cat-orange pl-3">2. 攻略地圖</h3>
+                     <h3 class="font-bold text-lg text-muji-text mb-3 border-l-4 border-cat-orange pl-3">2. 攻略地圖 </h3>
                      <img src="${ghibliStrategyImg}" class="w-full rounded-xl shadow-sm mb-2" onclick="showFullImage('${ghibliStrategyImg}')">
                 </div>
                 <div>
