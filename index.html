@@ -101,7 +101,7 @@
             opacity: 0;
         }
         .guide-content.open {
-            max-height: 5000px; /* 足夠大的高度 */
+            max-height: 6000px; /* 足夠大的高度 */
             opacity: 1;
         }
         .guide-arrow {
@@ -173,6 +173,26 @@
             z-index: 100;
         }
         .toast.show { opacity: 1; }
+        
+        /* 導覽標籤 */
+        .guide-tag {
+            background: linear-gradient(120deg, #ea580c 0%, #fb923c 100%);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .guide-highlight {
+            background-color: #ffedd5;
+            padding: 0 4px;
+            border-radius: 2px;
+            color: #c2410c;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden text-sm">
@@ -304,14 +324,7 @@
                     { time: '12:15', title: '抵達台灣', desc: 'TPE', type: 'arrival' },
                     { time: '13:00', title: '機場接送', desc: '回家囉~', type: 'car', highlight: true }
                 ]
-            },
-            checklist: [
-                '護照x4', '外幣', 'E-SIM', '台灣駕照+日文譯本', '信用卡',
-                '發熱衣褲x4', '衣服x3x4', '褲子x2x4', '內衣褲x8', '襪子x6', '背心x3', '圍巾',
-                '洗面乳/卸妝/保養品', '防晒/護唇膏', '牙刷牙膏', '泳衣/帽/鏡/巾x4', '折疊衣架',
-                '尿布/衛生棉/濕紙巾', '充電線材/Hub/幫浦', '備用藥/指甲刀/口罩',
-                '雪衣褲x4', '排汗衣褲x4', '中層保暖x4', '雪鏡/面罩/毛帽x4', '防摔褲x4', '護膝/肘/雪襪/手套'
-            ]
+            }
         };
 
         // --- State Management ---
@@ -525,7 +538,7 @@
             const jrContent = `
                 <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
                      <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
-                        <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>停車場入口 (一般/南口) 
+                        <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>停車場入口 (一般/南口)
                     </h3>
                     <div class="scroll-gallery no-scrollbar">
                         ${parkingImages.map((img, i) => `
@@ -567,7 +580,7 @@
             const suzukaContent = `
                 <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
                      <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
-                        <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>住宿者專用停車場 
+                        <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>住宿者專用停車場
                     </h3>
                     <div class="scroll-gallery no-scrollbar">
                         ${suzukaImages.map((img, i) => `
@@ -592,7 +605,7 @@
 
             const ghibliContent = `
                 <div class="mb-8">
-                     <h3 class="font-bold text-lg text-muji-text mb-3 border-l-4 border-cat-orange pl-3">1. 北口停車場 & APM </h3>
+                     <h3 class="font-bold text-lg text-muji-text mb-3 border-l-4 border-cat-orange pl-3">1. 北口停車場 & APM</h3>
                      <div class="grid grid-cols-2 gap-2 mb-2">
                         <div class="scroll-item h-28 w-full"><img src="${ghibliParkingImg}" class="w-full h-full object-cover" onclick="showFullImage('${ghibliParkingImg}')"></div>
                         <div class="scroll-item h-28 w-full"><img src="${ghibliApmImages[0]}" class="w-full h-full object-cover" onclick="showFullImage('${ghibliApmImages[0]}')"></div>
@@ -603,7 +616,7 @@
                      </div>
                 </div>
                  <div class="mb-8">
-                     <h3 class="font-bold text-lg text-muji-text mb-3 border-l-4 border-cat-orange pl-3">2. 攻略地圖 </h3>
+                     <h3 class="font-bold text-lg text-muji-text mb-3 border-l-4 border-cat-orange pl-3">2. 攻略地圖</h3>
                      <img src="${ghibliStrategyImg}" class="w-full rounded-xl shadow-sm mb-2" onclick="showFullImage('${ghibliStrategyImg}')">
                 </div>
                 <div>
@@ -795,13 +808,31 @@
 
         // --- 4. LISTS MODULE ---
         function renderLists(container) {
-            container.innerHTML = `
-            <div class="p-4 space-y-6">
-                <div class="bg-white rounded-3xl p-5 shadow-soft">
-                    <h3 class="font-bold text-muji-text mb-4 border-l-4 border-cat-orange pl-3">必備清單</h3>
-                    <div class="grid grid-cols-1 gap-3">
-                        ${tripData.checklist.map(item => `
-                            <label class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+            const checklists = {
+                '旅遊行李': [
+                    '護照x4', '外幣', 'E-SIM', '台灣駕照+日文譯本', '信用卡',
+                    '發熱衣褲x1x4', '衣服x3x4', '褲子x2x4', '內衣褲x8', '襪子x6', '背心x1x3', '圍巾',
+                    '洗面乳', '卸妝乳', '化妝品', '保養品', '乳液', '護唇膏', '防晒', '牙刷', '牙膏',
+                    '泳衣x4', '泳帽x4', '蛙鏡x4', '浴巾x4', '折疊衣架',
+                    '尿布', '衛生棉', '面紙', '濕紙巾',
+                    '手機/手錶充電線', '充電Hub', '各種充電線材', '充氣幫浦',
+                    '備用藥', '克流感', '指甲刀', '體溫計', '口罩', '日常藥膏', '暈車藥'
+                ],
+                '滑雪清單': [
+                    '雪衣x4', '雪褲x4', '排汗衣褲x4', '中層保暖x4', '雪鏡x4', '面罩x4', '毛帽x4',
+                    '防摔褲x4', '護膝x4', '護肘x2(小孩)', '雪襪x4', '手套x4', '內層手套x2(大人)'
+                ]
+            };
+
+            const createChecklistHTML = (title, items) => `
+                <div class="bg-white rounded-3xl overflow-hidden shadow-soft transition-all mb-4">
+                    <div class="p-4 bg-cat-light border-b border-orange-100 flex justify-between items-center cursor-pointer" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                        <h3 class="font-bold text-muji-text text-base"><i class="fa-solid fa-suitcase mr-2 text-cat-orange"></i>${title}</h3>
+                        <i class="fa-solid fa-chevron-down text-gray-400"></i>
+                    </div>
+                    <div class="p-4 grid grid-cols-1 gap-2">
+                        ${items.map(item => `
+                            <label class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer border border-transparent hover:border-gray-100">
                                 <div class="relative flex items-center">
                                     <input type="checkbox" onchange="toggleCheck('${item}')" ${checklistState[item] ? 'checked' : ''} class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 transition-all checked:border-cat-orange checked:bg-cat-orange">
                                     <i class="fa-solid fa-check text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs opacity-0 peer-checked:opacity-100 pointer-events-none"></i>
@@ -811,7 +842,14 @@
                         `).join('')}
                     </div>
                 </div>
-                <div class="bg-white rounded-3xl p-5 shadow-soft h-[400px] flex flex-col">
+            `;
+
+            container.innerHTML = `
+            <div class="p-4 space-y-4">
+                ${createChecklistHTML('旅遊行李清單', checklists['旅遊行李'])}
+                ${createChecklistHTML('滑雪清單', checklists['滑雪清單'])}
+                
+                <div class="bg-white rounded-3xl p-5 shadow-soft h-[300px] flex flex-col mt-6">
                     <h3 class="font-bold text-muji-text mb-2 border-l-4 border-cat-orange pl-3">備忘錄</h3>
                     <textarea id="memo-area" class="flex-1 w-full bg-muji-bg rounded-xl p-3 text-sm leading-relaxed outline-none resize-none border border-transparent focus:border-cat-orange" placeholder="輸入網址會自動變成按鈕...">${memoContent}</textarea>
                     <div class="mt-3 flex justify-between items-center">
