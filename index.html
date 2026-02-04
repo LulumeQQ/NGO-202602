@@ -334,13 +334,13 @@
                     title: '旅遊行李清單',
                     icon: 'fa-suitcase-rolling',
                     color: 'text-blue-500',
-                    items: '護照x4、外幣、E-SIM、台灣駕照+日文譯本、信用卡、發熱衣褲x1x4、衣服x3x4、褲子x2x4、內衣褲x8、襪子x6、背心x1x3、圍巾、洗面乳、卸妝乳、化妝品、保養品、乳液、護唇膏、防晒、牙刷、牙膏、泳衣x4、泳帽x4、蛙鏡x4、浴巾x4、折疊衣架、尿布、衛生棉、面紙、濕紙巾、手機/手錶充電線、充電Hub、各種充電線材、充氣幫浦、行李袋x4、備用藥、克流感、指甲刀、體溫計、口罩、日常藥膏、暈車藥'.split('、')
+                    items: '護照x4、外幣、E-SIM、台灣駕照+日文譯本、信用卡、發熱衣3件x4、發熱褲1件x3、衣服3件x4、褲子/裙子3件x4、內衣褲8套x4、襪子6雙x4、背心1件x3、圍巾1條x4、洗面乳、卸妝乳、化妝品、保養品、乳液、護唇膏、防晒、牙刷、牙膏、泳衣x4、泳帽x4、蛙鏡x4、浴巾x4、折疊衣架、尿布、衛生棉、面紙、濕紙巾、手機/手錶充電線、充電Hub、各種充電線材、充氣幫浦、行李袋x4、備用藥、克流感、指甲刀、體溫計、口罩、日常藥膏、暈車藥'.split(/[\n、]+/)
                 },
                 ski: {
                     title: '滑雪清單',
                     icon: 'fa-person-skiing',
                     color: 'text-cat-orange',
-                    items: '雪衣x4、雪褲x4、排汗衣褲x4、中層保暖x4、雪鏡x4、面罩x4、毛帽x4、防摔褲x4、護膝x4、護肘x2(小孩)、雪襪x4、手套x4、內層手套x2(大人)'.split('、')
+                    items: '雪衣x4、雪褲x4、排汗衣褲x4、中層保暖x4、雪鏡x4、面罩x4、毛帽x4、防摔褲x4、護膝x4、護肘x2(小孩)、雪襪x4、手套x4、內層手套x2(大人)'.split(/[\n、]+/)
                 }
             }
         };
@@ -367,19 +367,53 @@
             'person-skiing': 'fa-person-skiing'
         };
 
-        // --- Helper: Get Icon for Checklist ---
+        // --- Helper: Get Icon for Checklist (Specific Matching) ---
         function getIcon(name) {
+            // Document / Money
             if (name.includes('護照') || name.includes('駕照')) return 'fa-id-card';
             if (name.includes('錢') || name.includes('幣') || name.includes('卡')) return 'fa-credit-card';
-            if (name.includes('衣') || name.includes('褲') || name.includes('襪') || name.includes('背心') || name.includes('圍巾')) return 'fa-shirt';
-            if (name.includes('洗') || name.includes('妝') || name.includes('乳') || name.includes('膏') || name.includes('刷')) return 'fa-pump-soap';
-            if (name.includes('藥') || name.includes('罩') || name.includes('計')) return 'fa-kit-medical';
+            
+            // Clothing
+            if (name.includes('衣') || name.includes('背心') || name.includes('外套')) return 'fa-shirt';
+            if (name.includes('褲') || name.includes('裙')) return 'fa-layer-group';
+            if (name.includes('襪')) return 'fa-socks';
+            if (name.includes('圍巾')) return 'fa-user-tie';
+            if (name.includes('手套')) return 'fa-mitten';
+            
+            // Toiletries
+            if (name.includes('洗') || name.includes('卸') || name.includes('乳') || name.includes('膏') || name.includes('刷')) return 'fa-pump-soap';
+            if (name.includes('妝') || name.includes('保養') || name.includes('防晒')) return 'fa-spray-can-sparkles';
+            if (name.includes('唇')) return 'fa-face-smile-beam';
+            
+            // Electronics
             if (name.includes('電') || name.includes('SIM') || name.includes('Hub') || name.includes('充')) return 'fa-plug';
+            if (name.includes('手機')) return 'fa-mobile-screen-button';
+            if (name.includes('幫浦')) return 'fa-wind';
+            
+            // Medical / Health
+            if (name.includes('藥') || name.includes('流感') || name.includes('暈車')) return 'fa-pills';
+            if (name.includes('溫') || name.includes('計')) return 'fa-temperature-half';
+            if (name.includes('罩')) return 'fa-mask-face';
+            if (name.includes('剪') || name.includes('刀')) return 'fa-scissors';
+            
+            // Swimming / Water
+            if (name.includes('泳') || name.includes('蛙')) return 'fa-person-swimming';
+            if (name.includes('巾')) return 'fa-rug';
+            
+            // Baby / Hygiene
+            if (name.includes('尿') || name.includes('嬰')) return 'fa-baby';
+            if (name.includes('衛') || name.includes('紙')) return 'fa-box-tissue';
+            
+            // Skiing
             if (name.includes('雪') || name.includes('滑')) return 'fa-snowflake';
-            if (name.includes('泳') || name.includes('巾')) return 'fa-person-swimming';
-            if (name.includes('袋') || name.includes('包')) return 'fa-bag-shopping';
-            if (name.includes('食') || name.includes('麵')) return 'fa-bowl-food';
-            return 'fa-check';
+            if (name.includes('鏡')) return 'fa-glasses';
+            if (name.includes('護')) return 'fa-shield-halved';
+            
+            // Misc
+            if (name.includes('袋') || name.includes('包') || name.includes('架')) return 'fa-suitcase';
+            
+            // Fallback (Generic, NOT checkmark)
+            return 'fa-circle-dot';
         }
 
         // --- Core Functions ---
@@ -570,6 +604,7 @@
 
             const loginUrl = "https://d-reserve.jp/auth/realms/M000000678/protocol/openid-connect/auth?response_type=code&client_id=directin-s4&redirect_uri=https%3A%2F%2Fd-reserve.jp%2Fguest-reserve-front%2Fsso%2Flogin?hotelCode%3D0000001590%26return_url%3Dhttps%253A%252F%252Fd-reserve.jp%252Fauth%252Frealms%252Fdirectin-s4%252Fcdp%252Fgroups%252FM000000678%252Fredirects%252Faccount%253Freferrer_uri%253Dhttps%25253A%25252F%25252Fd-reserve.jp%25252FGSEA001F01300%25252FGSEA001A01%25253FhotelCode%25253D0000001590%252526lang%25253Den&state=faadacc5-08c9-485f-972f-9681fbea58dd&login=true&ui_locales=en&scope=openid";
 
+            // Helper to generate a Guide Card
             const createGuideCard = (id, title, tag, contentHTML, coverImg) => `
                 <div class="bg-white rounded-3xl overflow-hidden shadow-soft transition-all mb-6">
                     <div class="relative h-48 cursor-pointer group" onclick="toggleGuide('${id}')">
@@ -595,6 +630,7 @@
                 </div>
             `;
 
+            // ... Content blocks ...
             const jrContent = `
                 <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
                      <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
