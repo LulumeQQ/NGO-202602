@@ -320,29 +320,13 @@
                     title: '旅遊行李清單',
                     icon: 'fa-suitcase-rolling',
                     color: 'text-blue-500',
-                    items: [
-                        {n:'護照x4', i:'fa-passport'}, {n:'外幣', i:'fa-coins'}, {n:'E-SIM', i:'fa-sim-card'}, 
-                        {n:'駕照+譯本', i:'fa-id-card'}, {n:'信用卡', i:'fa-credit-card'}, {n:'發熱衣x4', i:'fa-temperature-arrow-up'},
-                        {n:'衣服x3x4', i:'fa-shirt'}, {n:'褲子x2x4', i:'fa-layer-group'}, {n:'內衣褲x8', i:'fa-socks'},
-                        {n:'襪子x6', i:'fa-socks'}, {n:'背心x3', i:'fa-vest'}, {n:'圍巾', i:'fa-snowflake'},
-                        {n:'洗面乳/卸妝', i:'fa-pump-soap'}, {n:'化妝/保養', i:'fa-spray-can-sparkles'}, {n:'防晒/護唇', i:'fa-sun'},
-                        {n:'牙刷牙膏', i:'fa-tooth'}, {n:'泳衣/帽/鏡', i:'fa-person-swimming'}, {n:'浴巾x4', i:'fa-rug'},
-                        {n:'折疊衣架', i:'fa-shirt'}, {n:'尿布/濕紙巾', i:'fa-baby'}, {n:'充電線/Hub', i:'fa-plug'},
-                        {n:'充氣幫浦', i:'fa-wind'}, {n:'備用藥/口罩', i:'fa-pills'}, {n:'指甲刀/暈車', i:'fa-kit-medical'}
-                    ]
+                    items: '護照x4、外幣、E-SIM、台灣駕照+日文譯本、信用卡、發熱衣褲x1x4、衣服x3x4、褲子x2x4、內衣褲x8、襪子x6、背心x1x3、圍巾、洗面乳、卸妝乳、化妝品、保養品、乳液、護唇膏、防晒、牙刷、牙膏、泳衣x4、泳帽x4、蛙鏡x4、浴巾x4、折疊衣架、尿布、衛生棉、面紙、濕紙巾、手機/手錶充電線、充電Hub、各種充電線材、充氣幫浦、行李袋x4、備用藥、克流感、指甲刀、體溫計、口罩、日常藥膏、暈車藥'.split('、')
                 },
                 ski: {
                     title: '滑雪清單',
                     icon: 'fa-person-skiing',
                     color: 'text-cat-orange',
-                    items: [
-                        {n:'雪衣x4', i:'fa-person-skiing'}, {n:'雪褲x4', i:'fa-person-snowboarding'}, 
-                        {n:'排汗衣褲x4', i:'fa-shirt'}, {n:'中層保暖x4', i:'fa-layer-group'}, 
-                        {n:'雪鏡x4', i:'fa-glasses'}, {n:'面罩x4', i:'fa-mask-face'}, 
-                        {n:'毛帽x4', i:'fa-snowflake'}, {n:'防摔褲x4', i:'fa-shield-halved'}, 
-                        {n:'護膝x4', i:'fa-bone'}, {n:'護肘x2', i:'fa-bandage'}, 
-                        {n:'雪襪x4', i:'fa-socks'}, {n:'手套x4', i:'fa-mitten'}, {n:'內層手套', i:'fa-hand-paper'}
-                    ]
+                    items: '雪衣x4、雪褲x4、排汗衣褲x4、中層保暖x4、雪鏡x4、面罩x4、毛帽x4、防摔褲x4、護膝x4、護肘x2(小孩)、雪襪x4、手套x4、內層手套x2(大人)'.split('、')
                 }
             }
         };
@@ -351,8 +335,12 @@
         let currentDay = 'd1';
         let walletRate = parseFloat(localStorage.getItem('trip_rate')) || 0.22;
         let expenses = JSON.parse(localStorage.getItem('trip_expenses')) || [];
+        // Trip checklist now stores both standard and user added items.
+        // We use a simple object: { "護照x4": true, "Custom Item": true }
         let checklistState = JSON.parse(localStorage.getItem('trip_checklist')) || {};
-        let memoContent = localStorage.getItem('trip_memo') || '';
+        // We also need to store "custom added" items separately so they persist
+        let customChecklistItems = JSON.parse(localStorage.getItem('trip_custom_items')) || []; 
+        let memoContent = ''; // Not used for storage anymore, just input
 
         // --- Icons Mapping ---
         const icons = {
@@ -366,6 +354,19 @@
             shop: 'fa-bag-shopping',
             'person-skiing': 'fa-person-skiing'
         };
+
+        // --- Helper: Get Icon for Checklist ---
+        function getIcon(name) {
+            if (name.includes('護照') || name.includes('駕照')) return 'fa-id-card';
+            if (name.includes('錢') || name.includes('幣') || name.includes('卡')) return 'fa-credit-card';
+            if (name.includes('衣') || name.includes('褲') || name.includes('襪') || name.includes('背心') || name.includes('圍巾')) return 'fa-shirt';
+            if (name.includes('洗') || name.includes('妝') || name.includes('乳') || name.includes('膏') || name.includes('刷')) return 'fa-pump-soap';
+            if (name.includes('藥') || name.includes('罩') || name.includes('計')) return 'fa-kit-medical';
+            if (name.includes('電') || name.includes('SIM')) return 'fa-plug';
+            if (name.includes('雪') || name.includes('滑')) return 'fa-snowflake';
+            if (name.includes('泳') || name.includes('巾')) return 'fa-person-swimming';
+            return 'fa-check';
+        }
 
         // --- Core Functions ---
         function init() {
@@ -453,8 +454,6 @@
             const btn = document.getElementById(`btn-${day}`);
             const container = document.getElementById('day-switcher');
             if (btn && container) {
-                // Scroll to the button's position minus a small padding to keep it on the left
-                // allowing next buttons to be visible
                 const scrollLeft = btn.offsetLeft - container.offsetLeft - 16; 
                 container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
             }
@@ -533,6 +532,9 @@
 
         // --- 2. GUIDE MODULE ---
         function renderGuide(container) {
+            // ... (Guide content strings same as before) ...
+            // Keeping it brief for this response as Guide was not the requested change focus
+            // But I will output the full HTML structure for the requested file
             const parkingImages = [
                 "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-1.png",
                 "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-2.png",
@@ -558,6 +560,7 @@
 
             const loginUrl = "https://d-reserve.jp/auth/realms/M000000678/protocol/openid-connect/auth?response_type=code&client_id=directin-s4&redirect_uri=https%3A%2F%2Fd-reserve.jp%2Fguest-reserve-front%2Fsso%2Flogin?hotelCode%3D0000001590%26return_url%3Dhttps%253A%252F%252Fd-reserve.jp%252Fauth%252Frealms%252Fdirectin-s4%252Fcdp%252Fgroups%252FM000000678%252Fredirects%252Faccount%253Freferrer_uri%253Dhttps%25253A%25252F%25252Fd-reserve.jp%25252FGSEA001F01300%25252FGSEA001A01%25253FhotelCode%25253D0000001590%252526lang%25253Den&state=faadacc5-08c9-485f-972f-9681fbea58dd&login=true&ui_locales=en&scope=openid";
 
+            // Helper to generate a Guide Card
             const createGuideCard = (id, title, tag, contentHTML, coverImg) => `
                 <div class="bg-white rounded-3xl overflow-hidden shadow-soft transition-all mb-6">
                     <div class="relative h-48 cursor-pointer group" onclick="toggleGuide('${id}')">
@@ -583,27 +586,21 @@
                 </div>
             `;
 
+            // ... Content blocks ...
             const jrContent = `
                 <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
                      <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
                         <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>停車場入口 (一般/南口) 
                     </h3>
                     <div class="scroll-gallery no-scrollbar">
-                        ${parkingImages.map((img, i) => `
-                            <div class="scroll-item shadow-sm h-40">
-                                <img src="${img}" class="w-full h-full object-cover" onclick="showFullImage('${img}')">
-                                <div class="scroll-indicator">${i+1}/4</div>
-                            </div>
-                        `).join('')}
+                        ${parkingImages.map((img, i) => `<div class="scroll-item shadow-sm h-40"><img src="${img}" class="w-full h-full object-cover" onclick="showFullImage('${img}')"><div class="scroll-indicator">${i+1}/4</div></div>`).join('')}
                     </div>
                 </div>
                 <div class="space-y-6">
                     <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-sm leading-relaxed">
                         <p class="font-bold text-cat-orange mb-1">タワーズ一般駐車場 南口入口</p>
                         <p class="text-gray-600 mb-2 text-xs">建議直接在導航輸入下方電話，這是最保險的方式。</p>
-                        <a href="tel:0525867811" class="flex items-center justify-center bg-white border border-orange-200 text-cat-orange font-mono font-bold py-2 rounded-lg shadow-sm active:scale-95 transition-transform">
-                            <i class="fa-solid fa-phone mr-2"></i> 052-586-7811
-                        </a>
+                        <a href="tel:0525867811" class="flex items-center justify-center bg-white border border-orange-200 text-cat-orange font-mono font-bold py-2 rounded-lg shadow-sm active:scale-95 transition-transform"><i class="fa-solid fa-phone mr-2"></i> 052-586-7811</a>
                     </div>
                     <div>
                         <h3 class="font-bold text-lg text-muji-text mb-3 flex items-center"><i class="fa-solid fa-camera text-cat-orange mr-2"></i>Bic Camera 攻略</h3>
@@ -614,27 +611,16 @@
                                 <li class="flex justify-between"><span>滿 <span class="font-mono text-base">20,000</span></span> <span class="bg-gray-100 px-2 py-1 rounded font-bold">折 2 hr</span></li>
                                 <li class="flex justify-between"><span>滿 <span class="font-mono text-base">50,000</span></span> <span class="bg-gray-100 px-2 py-1 rounded font-bold">折 3 hr</span></li>
                             </ul>
-                            <div class="mt-3 flex items-start gap-2 text-xs text-red-500 bg-red-50 p-2 rounded">
-                                <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
-                                <span>結帳時務必出示停車券。</span>
-                            </div>
+                            <div class="mt-3 flex items-start gap-2 text-xs text-red-500 bg-red-50 p-2 rounded"><i class="fa-solid fa-circle-exclamation mt-0.5"></i><span>結帳時務必出示停車券。</span></div>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
 
             const suzukaContent = `
                 <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
-                     <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
-                        <i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>住宿者專用停車場 
-                    </h3>
+                     <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center"><i class="fa-solid fa-square-parking text-cat-orange mr-2"></i>住宿者專用停車場</h3>
                     <div class="scroll-gallery no-scrollbar">
-                        ${suzukaImages.map((img, i) => `
-                            <div class="scroll-item shadow-sm h-40">
-                                <img src="${img}" class="w-full h-full object-cover" onclick="showFullImage('${img}')">
-                                <div class="scroll-indicator">${i+1}/3</div>
-                            </div>
-                        `).join('')}
+                        ${suzukaImages.map((img, i) => `<div class="scroll-item shadow-sm h-40"><img src="${img}" class="w-full h-full object-cover" onclick="showFullImage('${img}')"><div class="scroll-indicator">${i+1}/3</div></div>`).join('')}
                     </div>
                 </div>
                 <div class="space-y-4">
@@ -643,28 +629,17 @@
                         <p class="text-gray-700 mb-2">櫃台位於<span class="font-bold">「主棟」</span>。</p>
                         <p class="text-gray-600 text-xs">無論住哪一棟，請先至主棟辦理入住，工作人員會指引最近停車場。</p>
                     </div>
-                    <a href="${loginUrl}" target="_blank" class="block w-full bg-muji-text text-white text-center font-bold py-3 rounded-xl shadow-lg hover:bg-black transition-colors active:scale-95">
-                        <i class="fa-solid fa-right-to-bracket mr-2"></i>飯店登入 (Check-in)
-                    </a>
-                </div>
-            `;
+                    <a href="${loginUrl}" target="_blank" class="block w-full bg-muji-text text-white text-center font-bold py-3 rounded-xl shadow-lg hover:bg-black transition-colors active:scale-95"><i class="fa-solid fa-right-to-bracket mr-2"></i>飯店登入 (Check-in)</a>
+                </div>`;
             
             const ikenotairaContent = `
                 <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
-                     <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
-                        <i class="fa-solid fa-hotel text-cat-orange mr-2"></i>飯店外觀參考
-                    </h3>
+                     <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center"><i class="fa-solid fa-hotel text-cat-orange mr-2"></i>飯店外觀參考</h3>
                     <div class="scroll-gallery no-scrollbar">
-                        ${ikenotairaImages.map((img, i) => `
-                            <div class="scroll-item shadow-sm h-40">
-                                <img src="${img}" class="w-full h-full object-cover" onclick="showFullImage('${img}')">
-                                <div class="scroll-indicator">${i+1}/2</div>
-                            </div>
-                        `).join('')}
+                        ${ikenotairaImages.map((img, i) => `<div class="scroll-item shadow-sm h-40"><img src="${img}" class="w-full h-full object-cover" onclick="showFullImage('${img}')"><div class="scroll-indicator">${i+1}/2</div></div>`).join('')}
                     </div>
                     <p class="text-xs text-gray-500 mt-2">D3 - D6 連泊四晚，位於新本館。</p>
-                </div>
-            `;
+                </div>`;
 
             const ghibliContent = `
                 <div class="mb-8">
@@ -698,8 +673,7 @@
                         </div>
                         <div class="bg-red-50 p-2 rounded-lg text-xs text-red-600"><i class="fa-solid fa-triangle-exclamation mr-1"></i>室內禁拍 / 禁帶外食</div>
                     </div>
-                </div>
-            `;
+                </div>`;
 
             container.innerHTML = `
             <div class="p-6">
@@ -876,11 +850,23 @@
 
         // --- 4. LISTS MODULE ---
         function renderLists(container) {
+            // Merge custom items into Luggage list for display
+            let displayLuggageItems = [...tripData.checklist.luggage.items];
+            if (customChecklistItems.length > 0) {
+                displayLuggageItems = [...customChecklistItems, ...displayLuggageItems];
+            }
+
+            // Create a temp object for rendering, but don't modify original tripData
+            const renderData = {
+                luggage: { ...tripData.checklist.luggage, items: displayLuggageItems },
+                ski: tripData.checklist.ski
+            };
+
             container.innerHTML = `
             <div class="p-4 space-y-6">
                 <div class="grid grid-cols-2 gap-4">
-                    ${Object.keys(tripData.checklist).map(key => {
-                        const list = tripData.checklist[key];
+                    ${Object.keys(renderData).map(key => {
+                        const list = renderData[key];
                         return `
                         <div class="bg-white rounded-3xl p-5 shadow-soft cursor-pointer hover:shadow-lg transition-all active:scale-95 flex flex-col items-center justify-center gap-3 h-32" onclick="toggleList('${key}')">
                             <i class="fa-solid ${list.icon} text-4xl ${list.color}"></i>
@@ -890,8 +876,8 @@
                     }).join('')}
                 </div>
 
-                ${Object.keys(tripData.checklist).map(key => {
-                    const list = tripData.checklist[key];
+                ${Object.keys(renderData).map(key => {
+                    const list = renderData[key];
                     return `
                     <div id="list-content-${key}" class="hidden bg-white rounded-3xl p-5 shadow-soft animate-fade-in">
                         <div class="flex justify-between items-center mb-4 border-l-4 border-cat-orange pl-3">
@@ -902,12 +888,12 @@
                              ${list.items.map(item => `
                                 <label class="flex items-center space-x-2 p-2 rounded-lg bg-gray-50 hover:bg-orange-50 cursor-pointer group transition-colors">
                                     <div class="relative flex items-center flex-shrink-0">
-                                        <input type="checkbox" onchange="toggleCheck('${item.n}')" ${checklistState[item.n] ? 'checked' : ''} class="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 transition-all checked:border-cat-orange checked:bg-cat-orange">
+                                        <input type="checkbox" onchange="toggleCheck('${item}')" ${checklistState[item] ? 'checked' : ''} class="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 transition-all checked:border-cat-orange checked:bg-cat-orange">
                                         <i class="fa-solid fa-check text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] opacity-0 peer-checked:opacity-100 pointer-events-none"></i>
                                     </div>
                                     <div class="flex items-center gap-1.5 min-w-0">
-                                        <i class="fa-solid ${item.i} text-[10px] text-gray-400 group-hover:text-cat-orange"></i>
-                                        <span class="text-xs text-gray-600 peer-checked:text-gray-300 peer-checked:line-through truncate font-medium">${item.n}</span>
+                                        <i class="fa-solid ${getIcon(item)} text-[10px] text-gray-400 group-hover:text-cat-orange"></i>
+                                        <span class="text-xs text-gray-600 peer-checked:text-gray-300 peer-checked:line-through truncate font-medium">${item}</span>
                                     </div>
                                 </label>
                              `).join('')}
@@ -916,22 +902,17 @@
                     `;
                 }).join('')}
 
-                <div class="bg-white rounded-3xl p-5 shadow-soft h-[300px] flex flex-col">
-                    <h3 class="font-bold text-muji-text mb-2 border-l-4 border-cat-orange pl-3">備忘錄</h3>
-                    <textarea id="memo-area" class="flex-1 w-full bg-muji-bg rounded-xl p-3 text-sm leading-relaxed outline-none resize-none border border-transparent focus:border-cat-orange" placeholder="輸入網址會自動變成按鈕...">${memoContent}</textarea>
-                    <div class="mt-3 flex justify-between items-center">
-                         <div id="memo-links" class="flex gap-2 overflow-x-auto max-w-[200px] no-scrollbar"></div>
-                         <button onclick="saveMemo()" class="bg-cat-orange text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md">儲存</button>
-                    </div>
+                <div class="bg-white rounded-3xl p-5 shadow-soft">
+                    <h3 class="font-bold text-muji-text mb-2 border-l-4 border-cat-orange pl-3">個人備忘錄</h3>
+                    <p class="text-[10px] text-gray-400 mb-2">在此輸入文字，按下儲存後，將自動新增至「旅遊行李清單」中。(可輸入多項，以換行或 "、" 分隔)</p>
+                    <textarea id="memo-input" class="w-full bg-muji-bg rounded-xl p-3 text-sm leading-relaxed outline-none resize-none border border-transparent focus:border-cat-orange h-24" placeholder="例如：\n零食\n泡麵"></textarea>
+                    <button onclick="saveMemoAsItem()" class="w-full mt-3 bg-cat-orange text-white py-2 rounded-lg text-sm font-bold shadow-md active:scale-95 transition-transform">儲存並加入清單</button>
                 </div>
             </div>`;
-            updateMemoLinks();
         }
 
         function toggleList(key) {
-            // Hide all lists first
             document.querySelectorAll('[id^="list-content-"]').forEach(el => el.classList.add('hidden'));
-            // Show selected
             const target = document.getElementById(`list-content-${key}`);
             if(target) {
                 target.classList.remove('hidden');
@@ -942,28 +923,30 @@
         function toggleCheck(item) {
             checklistState[item] = !checklistState[item];
             localStorage.setItem('trip_checklist', JSON.stringify(checklistState));
-            // Optional: Re-render to show strikethrough updates immediately if CSS peer-checked isn't enough (it is enough here)
         }
 
-        function saveMemo() {
-            const val = document.getElementById('memo-area').value;
-            localStorage.setItem('trip_memo', val);
-            memoContent = val;
-            updateMemoLinks();
-            alert('已儲存');
-        }
+        function saveMemoAsItem() {
+            const inputVal = document.getElementById('memo-input').value;
+            if (!inputVal.trim()) return;
 
-        function updateMemoLinks() {
-            const matches = memoContent.match(/(https?:\/\/[^\s]+)/g);
-            const linkContainer = document.getElementById('memo-links');
-            if(linkContainer) {
-                if(matches) {
-                    linkContainer.innerHTML = matches.map((url, i) => 
-                        `<a href="${url}" target="_blank" class="bg-gray-100 text-cat-orange text-xs px-2 py-1 rounded whitespace-nowrap"><i class="fa-solid fa-link"></i> Link ${i+1}</a>`
-                    ).join('');
-                } else {
-                    linkContainer.innerHTML = '';
-                }
+            // Split by newline or '、'
+            const newItems = inputVal.split(/[\n、]+/).map(s => s.trim()).filter(s => s.length > 0);
+            
+            if (newItems.length > 0) {
+                // Add to custom list
+                customChecklistItems = [...customChecklistItems, ...newItems];
+                localStorage.setItem('trip_custom_items', JSON.stringify(customChecklistItems));
+                
+                // Clear input
+                document.getElementById('memo-input').value = '';
+                
+                // Re-render lists
+                renderLists(document.getElementById('app-content'));
+                
+                // Auto open luggage list to show new item
+                toggleList('luggage');
+                
+                alert(`已新增 ${newItems.length} 個項目至行李清單`);
             }
         }
 
