@@ -33,11 +33,18 @@
                     },
                     animation: {
                         'fade-in': 'fadeIn 0.4s ease-out',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
                     },
                     keyframes: {
                         fadeIn: {
                             '0%': { opacity: '0', transform: 'translateY(5px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
                         }
                     }
                 }
@@ -50,6 +57,7 @@
             background-color: #fdfbf7;
             color: #44403c;
             -webkit-tap-highlight-color: transparent;
+            user-select: none; /* 防止長按選取文字 */
         }
         
         /* 隱藏 Scrollbar 但保留功能 */
@@ -182,6 +190,12 @@
             z-index: 100;
         }
         .toast.show { opacity: 1; }
+
+        /* 長按動畫 */
+        .long-press-active {
+            transform: scale(0.95);
+            background-color: #fee2e2; /* Red-100 */
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden text-sm">
@@ -335,12 +349,10 @@
         let currentDay = 'd1';
         let walletRate = parseFloat(localStorage.getItem('trip_rate')) || 0.22;
         let expenses = JSON.parse(localStorage.getItem('trip_expenses')) || [];
-        // Trip checklist now stores both standard and user added items.
-        // We use a simple object: { "護照x4": true, "Custom Item": true }
         let checklistState = JSON.parse(localStorage.getItem('trip_checklist')) || {};
-        // We also need to store "custom added" items separately so they persist
         let customChecklistItems = JSON.parse(localStorage.getItem('trip_custom_items')) || []; 
-        let memoContent = ''; // Not used for storage anymore, just input
+        let deletedListItems = JSON.parse(localStorage.getItem('trip_deleted_items')) || {};
+        let memoContent = '';
 
         // --- Icons Mapping ---
         const icons = {
@@ -362,9 +374,11 @@
             if (name.includes('衣') || name.includes('褲') || name.includes('襪') || name.includes('背心') || name.includes('圍巾')) return 'fa-shirt';
             if (name.includes('洗') || name.includes('妝') || name.includes('乳') || name.includes('膏') || name.includes('刷')) return 'fa-pump-soap';
             if (name.includes('藥') || name.includes('罩') || name.includes('計')) return 'fa-kit-medical';
-            if (name.includes('電') || name.includes('SIM')) return 'fa-plug';
+            if (name.includes('電') || name.includes('SIM') || name.includes('Hub') || name.includes('充')) return 'fa-plug';
             if (name.includes('雪') || name.includes('滑')) return 'fa-snowflake';
             if (name.includes('泳') || name.includes('巾')) return 'fa-person-swimming';
+            if (name.includes('袋') || name.includes('包')) return 'fa-bag-shopping';
+            if (name.includes('食') || name.includes('麵')) return 'fa-bowl-food';
             return 'fa-check';
         }
 
@@ -421,7 +435,7 @@
             container.innerHTML = flightHTML + switcherHTML + timelineHTML;
             checkSelection();
             
-            // Initial scroll to ensure current day button is visible
+            // Initial scroll
             setTimeout(() => {
                 const btn = document.getElementById(`btn-${currentDay}`);
                 const container = document.getElementById('day-switcher');
@@ -435,7 +449,7 @@
         function switchDay(day) {
             currentDay = day;
             
-            // Update buttons style
+            // Update buttons
             tripData.days.forEach(d => {
                 const btn = document.getElementById(`btn-${d.key}`);
                 if(btn) {
@@ -443,7 +457,6 @@
                 }
             });
 
-            // Update Timeline content
             const timelineContainer = document.getElementById('timeline-list');
             timelineContainer.innerHTML = renderDayItems(day);
             
@@ -532,9 +545,6 @@
 
         // --- 2. GUIDE MODULE ---
         function renderGuide(container) {
-            // ... (Guide content strings same as before) ...
-            // Keeping it brief for this response as Guide was not the requested change focus
-            // But I will output the full HTML structure for the requested file
             const parkingImages = [
                 "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-1.png",
                 "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-2.png",
@@ -560,7 +570,6 @@
 
             const loginUrl = "https://d-reserve.jp/auth/realms/M000000678/protocol/openid-connect/auth?response_type=code&client_id=directin-s4&redirect_uri=https%3A%2F%2Fd-reserve.jp%2Fguest-reserve-front%2Fsso%2Flogin?hotelCode%3D0000001590%26return_url%3Dhttps%253A%252F%252Fd-reserve.jp%252Fauth%252Frealms%252Fdirectin-s4%252Fcdp%252Fgroups%252FM000000678%252Fredirects%252Faccount%253Freferrer_uri%253Dhttps%25253A%25252F%25252Fd-reserve.jp%25252FGSEA001F01300%25252FGSEA001A01%25253FhotelCode%25253D0000001590%252526lang%25253Den&state=faadacc5-08c9-485f-972f-9681fbea58dd&login=true&ui_locales=en&scope=openid";
 
-            // Helper to generate a Guide Card
             const createGuideCard = (id, title, tag, contentHTML, coverImg) => `
                 <div class="bg-white rounded-3xl overflow-hidden shadow-soft transition-all mb-6">
                     <div class="relative h-48 cursor-pointer group" onclick="toggleGuide('${id}')">
@@ -586,7 +595,6 @@
                 </div>
             `;
 
-            // ... Content blocks ...
             const jrContent = `
                 <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
                      <h3 class="font-bold text-sm text-muji-text mb-3 flex items-center">
@@ -850,13 +858,14 @@
 
         // --- 4. LISTS MODULE ---
         function renderLists(container) {
-            // Merge custom items into Luggage list for display
+            // Merge custom items into Luggage list display
             let displayLuggageItems = [...tripData.checklist.luggage.items];
             if (customChecklistItems.length > 0) {
+                // Add custom items to the top
                 displayLuggageItems = [...customChecklistItems, ...displayLuggageItems];
             }
 
-            // Create a temp object for rendering, but don't modify original tripData
+            // Create display data object
             const renderData = {
                 luggage: { ...tripData.checklist.luggage, items: displayLuggageItems },
                 ski: tripData.checklist.ski
@@ -885,19 +894,26 @@
                              <button onclick="toggleList('${key}')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                         <div class="grid grid-cols-2 gap-x-3 gap-y-3">
-                             ${list.items.map(item => `
-                                <label class="flex items-center space-x-2 p-2 rounded-lg bg-gray-50 hover:bg-orange-50 cursor-pointer group transition-colors">
+                             ${list.items.filter(item => !deletedListItems[item]).map(item => `
+                                <label class="flex items-center space-x-2 p-2 rounded-lg bg-gray-50 hover:bg-orange-50 cursor-pointer group transition-colors select-none"
+                                    onmousedown="startLongPress('${item}', '${key}')" 
+                                    ontouchstart="startLongPress('${item}', '${key}')" 
+                                    onmouseup="cancelLongPress()" 
+                                    onmouseleave="cancelLongPress()"
+                                    ontouchend="cancelLongPress()"
+                                    id="label-${item}">
                                     <div class="relative flex items-center flex-shrink-0">
                                         <input type="checkbox" onchange="toggleCheck('${item}')" ${checklistState[item] ? 'checked' : ''} class="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 transition-all checked:border-cat-orange checked:bg-cat-orange">
                                         <i class="fa-solid fa-check text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] opacity-0 peer-checked:opacity-100 pointer-events-none"></i>
                                     </div>
-                                    <div class="flex items-center gap-1.5 min-w-0">
+                                    <div class="flex items-center gap-1.5 min-w-0 overflow-hidden">
                                         <i class="fa-solid ${getIcon(item)} text-[10px] text-gray-400 group-hover:text-cat-orange"></i>
                                         <span class="text-xs text-gray-600 peer-checked:text-gray-300 peer-checked:line-through truncate font-medium">${item}</span>
                                     </div>
                                 </label>
                              `).join('')}
                         </div>
+                        <p class="text-[10px] text-gray-300 mt-4 text-center">💡 長按項目可刪除</p>
                     </div>
                     `;
                 }).join('')}
@@ -925,6 +941,48 @@
             localStorage.setItem('trip_checklist', JSON.stringify(checklistState));
         }
 
+        // --- Long Press Logic ---
+        let longPressTimer;
+        let isLongPress = false;
+
+        function startLongPress(item, listKey) {
+            isLongPress = false;
+            const element = document.getElementById(`label-${item}`);
+            if(element) element.classList.add('long-press-active');
+            
+            longPressTimer = setTimeout(() => {
+                isLongPress = true;
+                if(confirm(`確定刪除「${item}」嗎？`)) {
+                    deleteListItem(item, listKey);
+                }
+                if(element) element.classList.remove('long-press-active');
+            }, 800); // 800ms threshold
+        }
+
+        function cancelLongPress() {
+            clearTimeout(longPressTimer);
+            const activeEls = document.querySelectorAll('.long-press-active');
+            activeEls.forEach(el => el.classList.remove('long-press-active'));
+        }
+
+        function deleteListItem(item, listKey) {
+            // Check if it's a custom item
+            const customIndex = customChecklistItems.indexOf(item);
+            if (customIndex > -1) {
+                // Remove from custom list array
+                customChecklistItems.splice(customIndex, 1);
+                localStorage.setItem('trip_custom_items', JSON.stringify(customChecklistItems));
+            } else {
+                // It's a static item, mark as deleted
+                deletedListItems[item] = true;
+                localStorage.setItem('trip_deleted_items', JSON.stringify(deletedListItems));
+            }
+            
+            // Re-render
+            renderLists(document.getElementById('app-content'));
+            toggleList(listKey); // Re-open the list
+        }
+
         function saveMemoAsItem() {
             const inputVal = document.getElementById('memo-input').value;
             if (!inputVal.trim()) return;
@@ -934,7 +992,7 @@
             
             if (newItems.length > 0) {
                 // Add to custom list
-                customChecklistItems = [...customChecklistItems, ...newItems];
+                customChecklistItems = [...newItems, ...customChecklistItems]; // Add to top
                 localStorage.setItem('trip_custom_items', JSON.stringify(customChecklistItems));
                 
                 // Clear input
