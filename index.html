@@ -167,7 +167,7 @@
             border-radius: 12px;
             padding: 12px;
             outline: none;
-            transition: ring 0.2s;
+            transition: box-shadow 0.2s;
         }
         .muji-input:focus {
             box-shadow: 0 0 0 2px #ea580c;
@@ -241,13 +241,23 @@
         </div>
     </nav>
 
-    <div id="img-modal" class="fixed inset-0 bg-black/95 hidden z-50 flex justify-center items-center p-2 backdrop-blur-sm" onclick="this.classList.add('hidden')">
+    <div id="img-modal" class="fixed inset-0 bg-black/95 hidden z-50 justify-center items-center p-2 backdrop-blur-sm" onclick="this.classList.add('hidden'); this.classList.remove('flex')">
         <img id="img-modal-src" src="" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl object-contain">
     </div>
     
     <div id="toast" class="toast">地址已複製</div>
 
     <script>
+        // --- Helper: Generate ski day itinerary ---
+        const IKENOTAIRA_ADDR = '1596 Ashidahakkano, Tateshina, Kitasaku District, Nagano 391-0321日本';
+        function skiDay(resort, resortAddr, skiDesc = '全日滑雪') {
+            return [
+                { time: '07:30', title: '早餐', desc: '白樺渡假池之平飯店(新本館)', type: 'food' },
+                { time: '09:00', title: resort, desc: skiDesc, type: 'person-skiing', highlight: true, addr: resortAddr },
+                { time: '17:00', title: '晚餐與住宿', desc: '白樺渡假池之平飯店(新本館)', type: 'hotel', addr: IKENOTAIRA_ADDR }
+            ];
+        }
+
         // --- Data Configuration ---
         const tripData = {
             flights: [
@@ -291,21 +301,9 @@
                     { time: '08:00', title: '吉卜力公園', desc: '北1駐車場a\n玩到 13:00', type: 'car', addr: 'モリコロパーク北１駐車場a' },
                     { time: '16:00', title: '晚餐與住宿', desc: '白樺渡假池之平飯店(新本館)\n長野縣', type: 'hotel', addr: '1596 Ashidahakkano, Tateshina, Kitasaku District, Nagano 391-0321日本' }
                 ],
-                d4: [
-                    { time: '07:30', title: '早餐', desc: '白樺渡假池之平飯店(新本館)', type: 'food' },
-                    { time: '09:00', title: '白樺高原國際滑雪場', desc: '全日滑雪', type: 'person-skiing', highlight: true, addr: '743 Ashidahakkano, Tateshina, Kitasaku District, Nagano 384-2309日本' },
-                    { time: '17:00', title: '晚餐與住宿', desc: '白樺渡假池之平飯店(新本館)', type: 'hotel', addr: '1596 Ashidahakkano, Tateshina, Kitasaku District, Nagano 391-0321日本' }
-                ],
-                d5: [
-                    { time: '07:30', title: '早餐', desc: '白樺渡假池之平飯店(新本館)', type: 'food' },
-                    { time: '09:00', title: '白樺高原國際滑雪場', desc: '全日滑雪', type: 'person-skiing', highlight: true, addr: '743 Ashidahakkano, Tateshina, Kitasaku District, Nagano 384-2309日本' },
-                    { time: '17:00', title: '晚餐與住宿', desc: '白樺渡假池之平飯店(新本館)', type: 'hotel', addr: '1596 Ashidahakkano, Tateshina, Kitasaku District, Nagano 391-0321日本' }
-                ],
-                d6: [
-                    { time: '07:30', title: '早餐', desc: '白樺渡假池之平飯店(新本館)', type: 'food' },
-                    { time: '09:00', title: '車山高原滑雪場', desc: '全日滑雪', type: 'person-skiing', highlight: true, addr: '日本〒391-0301 Nagano, Chino, Kitayama, 車山3413' },
-                    { time: '17:00', title: '晚餐與住宿', desc: '白樺渡假池之平飯店(新本館)', type: 'hotel', addr: '1596 Ashidahakkano, Tateshina, Kitasaku District, Nagano 391-0321日本' }
-                ],
+                d4: skiDay('白樺高原國際滑雪場', '743 Ashidahakkano, Tateshina, Kitasaku District, Nagano 384-2309日本'),
+                d5: skiDay('白樺高原國際滑雪場', '743 Ashidahakkano, Tateshina, Kitasaku District, Nagano 384-2309日本'),
+                d6: skiDay('車山高原滑雪場', '日本〒391-0301 Nagano, Chino, Kitayama, 車山3413'),
                 d7: [
                     { time: '07:30', title: '早餐', desc: '白樺渡假池之平飯店(新本館)', type: 'food' },
                     { time: '09:00', title: '車山高原滑雪場', desc: '半日滑雪 & 中餐', type: 'person-skiing', addr: '日本〒391-0301 Nagano, Chino, Kitayama, 車山3413' },
@@ -352,7 +350,6 @@
         let checklistState = JSON.parse(localStorage.getItem('trip_checklist')) || {};
         let customChecklistItems = JSON.parse(localStorage.getItem('trip_custom_items')) || []; 
         let deletedListItems = JSON.parse(localStorage.getItem('trip_deleted_items')) || {};
-        let memoContent = '';
 
         // --- Icons Mapping ---
         const icons = {
@@ -514,12 +511,13 @@
                 const highlightClass = item.highlight ? 'text-cat-orange' : 'text-gray-400';
                 const uniqueId = `${day}-${index}`;
                 
+                const safeAddr = item.addr ? item.addr.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
                 const mapBtn = item.addr ? 
                     `<div class="mt-3 flex gap-2">
                         <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.addr)}" target="_blank" class="flex-1 inline-flex justify-center items-center text-xs bg-gray-50 border border-gray-200 hover:bg-orange-50 hover:border-orange-200 text-gray-600 px-3 py-2 rounded-lg transition-colors shadow-sm" onclick="event.stopPropagation()">
                             <i class="fa-solid fa-map-location-dot mr-1.5 text-cat-orange"></i> 導航
                         </a>
-                        <button onclick="copyAddr('${item.addr}'); event.stopPropagation();" class="inline-flex justify-center items-center w-10 text-xs bg-gray-50 border border-gray-200 text-gray-500 rounded-lg active:bg-gray-200">
+                        <button data-addr="${safeAddr}" onclick="copyAddr(this.dataset.addr); event.stopPropagation();" class="inline-flex justify-center items-center w-10 text-xs bg-gray-50 border border-gray-200 text-gray-500 rounded-lg active:bg-gray-200">
                             <i class="fa-solid fa-copy"></i>
                         </button>
                     </div>` : '';
@@ -533,7 +531,7 @@
                     </div>
                     
                     <div class="flex-1 pb-4">
-                        <div id="card-${uniqueId}" class="trip-card bg-white p-4 rounded-2xl shadow-soft relative">
+                        <div id="card-${uniqueId}" class="trip-card bg-white p-4 rounded-2xl shadow-soft relative" onclick="toggleSelection('${uniqueId}')">
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h4 class="font-bold text-base text-muji-text ${item.highlight ? 'text-cat-orange' : ''}">${item.title}</h4>
@@ -580,26 +578,26 @@
         // --- 2. GUIDE MODULE ---
         function renderGuide(container) {
             const parkingImages = [
-                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-1.png",
-                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-2.png",
-                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-3.png",
-                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E3%82%BF%E3%83%AF%E3%83%BC%E3%82%BA%E4%B8%80%E8%88%AC%E9%A7%90%E8%BB%8A%E5%A0%B4-%E5%8D%97%E5%8F%A3%E5%85%A5%E5%8F%A3-4.png"
+                "./タワーズ一般駐車場-南口入口-1.png",
+                "./タワーズ一般駐車場-南口入口-2.png",
+                "./タワーズ一般駐車場-南口入口-3.png",
+                "./タワーズ一般駐車場-南口入口-4.png"
             ];
             const suzukaImages = [
-                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-1.png",
-                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-2.png",
-                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E9%88%B4%E9%B9%BF%E8%B3%BD%E9%81%93%E6%A8%82%E5%9C%92%E9%85%92%E5%BA%97%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3-3.png"
+                "./鈴鹿賽道樂園酒店停車場入口-1.png",
+                "./鈴鹿賽道樂園酒店停車場入口-2.png",
+                "./鈴鹿賽道樂園酒店停車場入口-3.png"
             ];
-            const ghibliParkingImg = "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%8C%971%E5%81%9C%E8%BB%8A%E5%A0%B4%E5%85%A5%E5%8F%A3.png";
+            const ghibliParkingImg = "./吉卜力北1停車場入口.png";
             const ghibliApmImages = [
-                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%8C%971%E5%81%9C%E8%BB%8A%E5%A0%B4-APM%E8%B3%BC%E7%A5%A8%E8%99%95.jpg",
-                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E5%8C%971%E5%81%9C%E8%BB%8A%E5%A0%B4-APM%E8%B3%BC%E7%A5%A8%E8%99%952.jpg"
+                "./吉卜力北1停車場-APM購票處.jpg",
+                "./吉卜力北1停車場-APM購票衰2.jpg"
             ];
-            const ghibliStrategyImg = "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E5%90%89%E5%8D%9C%E5%8A%9B%E6%94%BB%E7%95%A5.png";
+            const ghibliStrategyImg = "./吉卜力攻略.png";
             
             const ikenotairaImages = [
-                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E7%99%BD%E6%A8%BA%E6%B8%A1%E5%81%87%E6%B1%A0%E4%B9%8B%E5%B9%B3%E9%A3%AF%E5%BA%97-1.png",
-                "https://raw.githubusercontent.com/LulumeQQ/NGO-202602/main/%E7%99%BD%E6%A8%BA%E6%B8%A1%E5%81%87%E6%B1%A0%E4%B9%8B%E5%B9%B3%E9%A3%AF%E5%BA%97-2.png"
+                "./白樺渡假池之平飯店-1.png",
+                "./白樺渡假池之平飯店-2.png"
             ];
 
             const loginUrl = "https://d-reserve.jp/auth/realms/M000000678/protocol/openid-connect/auth?response_type=code&client_id=directin-s4&redirect_uri=https%3A%2F%2Fd-reserve.jp%2Fguest-reserve-front%2Fsso%2Flogin?hotelCode%3D0000001590%26return_url%3Dhttps%253A%252F%252Fd-reserve.jp%252Fauth%252Frealms%252Fdirectin-s4%252Fcdp%252Fgroups%252FM000000678%252Fredirects%252Faccount%253Freferrer_uri%253Dhttps%25253A%25252F%25252Fd-reserve.jp%25252FGSEA001F01300%25252FGSEA001A01%25253FhotelCode%25253D0000001590%252526lang%25253Den&state=faadacc5-08c9-485f-972f-9681fbea58dd&login=true&ui_locales=en&scope=openid";
@@ -737,7 +735,9 @@
 
         function showFullImage(src) {
             document.getElementById('img-modal-src').src = src;
-            document.getElementById('img-modal').classList.remove('hidden');
+            const modal = document.getElementById('img-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
         // --- 3. WALLET MODULE ---
@@ -820,13 +820,16 @@
         }
 
         function calculate() {
-            const input = document.getElementById('calc-input').value;
+            const input = document.getElementById('calc-input').value.replace(/\s/g, '');
             try {
-                const res = eval(input.replace(/[^-()\d/*+.]/g, '')); 
+                if (!input || !/^[0-9+\-*/().]+$/.test(input)) throw new Error('invalid');
+                const res = new Function('return (' + input + ')')();
+                if (typeof res !== 'number' || !isFinite(res)) throw new Error('invalid');
                 document.getElementById('calc-result').innerText = '¥ ' + res.toLocaleString();
                 document.getElementById('calc-twd').innerText = '≈ NT$ ' + Math.round(res * walletRate).toLocaleString();
             } catch(e) {
                 document.getElementById('calc-result').innerText = 'Error';
+                document.getElementById('calc-twd').innerText = '';
             }
         }
 
@@ -930,16 +933,19 @@
                              <button onclick="toggleList('${key}')" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                         <div class="grid grid-cols-2 gap-x-3 gap-y-3">
-                             ${list.items.filter(item => !deletedListItems[item]).map(item => `
+                             ${list.items.filter(item => !deletedListItems[item]).map((item, idx) => {
+                                const safeItem = item.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                                return `
                                 <label class="flex items-center space-x-2 p-2 rounded-lg bg-gray-50 hover:bg-orange-50 cursor-pointer group transition-colors select-none"
-                                    onmousedown="startLongPress('${item}', '${key}')" 
-                                    ontouchstart="startLongPress('${item}', '${key}')" 
+                                    data-item="${safeItem}" data-list="${key}"
+                                    onmousedown="startLongPress(this)" 
+                                    ontouchstart="startLongPress(this)" 
                                     onmouseup="cancelLongPress()" 
                                     onmouseleave="cancelLongPress()"
                                     ontouchend="cancelLongPress()"
-                                    id="label-${item}">
+                                    id="item-${key}-${idx}">
                                     <div class="relative flex items-center flex-shrink-0">
-                                        <input type="checkbox" onchange="toggleCheck('${item}')" ${checklistState[item] ? 'checked' : ''} class="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 transition-all checked:border-cat-orange checked:bg-cat-orange">
+                                        <input type="checkbox" onchange="toggleCheck(this.closest('label').dataset.item)" ${checklistState[item] ? 'checked' : ''} class="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 transition-all checked:border-cat-orange checked:bg-cat-orange">
                                         <i class="fa-solid fa-check text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] opacity-0 peer-checked:opacity-100 pointer-events-none"></i>
                                     </div>
                                     <div class="flex items-center gap-1.5 min-w-0 overflow-hidden">
@@ -947,7 +953,8 @@
                                         <span class="text-xs text-gray-600 peer-checked:text-gray-300 peer-checked:line-through truncate font-medium">${item}</span>
                                     </div>
                                 </label>
-                             `).join('')}
+                                `;
+                             }).join('')}
                         </div>
                         <p class="text-[10px] text-gray-300 mt-4 text-center">💡 長按項目可刪除</p>
                     </div>
@@ -981,18 +988,19 @@
         let longPressTimer;
         let isLongPress = false;
 
-        function startLongPress(item, listKey) {
+        function startLongPress(el) {
             isLongPress = false;
-            const element = document.getElementById(`label-${item}`);
-            if(element) element.classList.add('long-press-active');
+            el.classList.add('long-press-active');
+            const item = el.dataset.item;
+            const listKey = el.dataset.list;
             
             longPressTimer = setTimeout(() => {
                 isLongPress = true;
                 if(confirm(`確定刪除「${item}」嗎？`)) {
                     deleteListItem(item, listKey);
                 }
-                if(element) element.classList.remove('long-press-active');
-            }, 800); // 800ms threshold
+                el.classList.remove('long-press-active');
+            }, 800);
         }
 
         function cancelLongPress() {
